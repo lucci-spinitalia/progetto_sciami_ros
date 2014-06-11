@@ -45,10 +45,10 @@
 
 Saetta_Base::Saetta_Base()
 {
-    this->_uptodate = 0;
-    this->_socket = 0;
-    this->_angular=0;
-    this->_linear=0;
+    this->_angular = 0;
+    this->_linear = 0;
+    this->node_handler=new ros::NodeHandle();
+    this->pos_publisher = this->node_handler->advertise<nav_msgs::Odometry>("saetta/odom",1000);
 } // end NodeExample()
 
 /*------------------------------------------------------------------------------
@@ -59,39 +59,21 @@ Saetta_Base::Saetta_Base()
 Saetta_Base::~Saetta_Base()
 {
 } // end ~NodeExample()
-
-
-/*bool Saetta_Base::IsUpToDate(void)
-{
-    return this->_uptodate;
-}*/
-
-/*void Saetta_Base::InitWifi(char *ip)
-{
-    this->_socket = this->_localwifihndl.init_wifi(ip);
-    if (this->_socket != 0)
-    {
-        this->_init = true;
-        this->_localwifihndl.send_wifi_vel(0,0);
-    }
-}*/
-        
-/*void Saetta_Base::SendWifiSpeed(void)
-{
-    if (this->IsUpToDate() && this->_init)
-    {
-        this->_localwifihndl.send_wifi_vel((float)_linear,(float)_angular);
-        this->_uptodate = false;
-    }
-}*/
-        
         
 /*------------------------------------------------------------------------------
  * listenerCallback()
  * Receive twist message.
  *----------------------------------------------------------------------------*/
 
-void Saetta_Base::listenerCallback (_local_msgtype & msg)
+void Saetta_Base::set_position(float x, float y, float th)
+{
+    this->x = x;
+    this->y = y;
+    this->th = th;
+}
+
+
+void Saetta_Base::listenerCallback(_local_msgtype & msg)
 {
    // ROS_INFO("Received linear: [%f], angular: [%f]\n", msg->linear, msg->angular);
     this->processData(msg);
@@ -101,54 +83,21 @@ void Saetta_Base::processData(_local_msgtype & msg){
 	
 	this->_linear = 100.0 * msg->linear.x;
   	this->_angular = msg->angular.z;
-   	this->_uptodate = true;
-	
-
-    //this->SendWifiSpeed();
+   	//this->_uptodate = true;
 }
 
 /*------------------------------------------------------------------------------
- * publishMessage()
+ * publish_odom()
  * Publish the message.
  *----------------------------------------------------------------------------*/
-/*
-void Saetta_Base::publishMessage(ros::Publisher *pub_message)
-{
-  Saetta_Base::Saetta_Base_data msg;
-  msg.message = message;
-  msg.a = a;
-  msg.b = b;
 
-  pub_message->publish(msg);
-} // end publishMessage()
-*/
-/*------------------------------------------------------------------------------
- * messageCallback()
- * Callback function for subscriber.
- *----------------------------------------------------------------------------*/
-/*
-void Saetta_Base::messageCallback(const Saetta_Base::Saetta_Base_data::ConstPtr &msg)
+void Saetta_Base::publish_odom()
 {
-  message = msg->message;
-  a = msg->a;
-  b = msg->b;
-
-  // Note that these are only set to INFO so they will print to a terminal for example purposes.
-  // Typically, they should be DEBUG.
-  ROS_INFO("message is %s", message.c_str());
-  ROS_INFO("sum of a + b = %d", a + b);
-} // end publishCallback()
-*/
-/*------------------------------------------------------------------------------
- * configCallback()
- * Callback function for dynamic reconfigure server.
- *----------------------------------------------------------------------------*/
-/*
-void Saetta_Base::configCallback(Saetta_Base::Saetta_Base_paramsConfig &config, uint32_t level)
-{
-  // Set class variables to new values. They should match what is input at the dynamic reconfigure GUI.
-  message = config.message.c_str();
-  a = config.a;
-  b = config.b;
-} // end configCallback()
-*/
+  nav_msgs::Odometry odom;
+  odom.header.stamp = ros::Time::now();
+  odom.header.frame_id = "odom";
+  odom.pose.pose.position.x = this->x;
+  odom.pose.pose.position.y = this->y;
+  odom.pose.pose.position.z = 0.0;
+  this->pos_publisher.publish(odom);
+} 
