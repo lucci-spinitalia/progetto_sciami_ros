@@ -72,6 +72,7 @@ int tty_open(char* tty_dev) {
 		new_attributes.c_oflag &= ~OPOST;
 
 		tcsetattr(pic_fd, TCSANOW, &new_attributes);
+                
 	}
   return pic_fd;
 }
