@@ -36,6 +36,7 @@ pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 void setup_termination();
 void termination_handler(int signum);
 void* tf_pic2netus(void *args);
+int set_interface_attribs (int fd, int speed, int parity);
 
 
 
@@ -55,7 +56,9 @@ void termination_handler(int signum)
     // Clean the buffer	
     tcflush(pic_fd, TCIFLUSH);
     tcflush(pic_fd, TCOFLUSH);	
- 
+    //printf("lastvel2send = %i\n", pic_last_vel_2_send);
+    //printf("lastvel2write = %i\n", pic_last_vel_2_write);
+
     set_vel_2_array(pic_buffer[pic_last_vel_2_send], 0, 0);
     write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SPEED_LENGTH + 1);
     sync();
@@ -108,6 +111,15 @@ int main(int argc, char** argv)
         i++;
     }
     printf("\n");
+    
+    int myfd = open (nPort_char, O_RDWR | O_NOCTTY | O_SYNC);
+    if (myfd < 0)
+    {
+        printf ("error %d opening %s: %s", errno, nPort_char, strerror (errno));
+        return -1;
+    }
+    set_interface_attribs (myfd, B115200, 0);
+    close(myfd);
     
     init_robot();
     
@@ -209,4 +221,29 @@ void* tf_pic2netus(void *args)
             pthread_cond_signal(&cond); //riparte parte il ciclo ROS
         }
     }	
+}
+
+
+
+int set_interface_attribs (int fd, int speed, int parity)
+{
+        struct termios tty;
+        memset (&tty, 0, sizeof tty);
+        if (tcgetattr (fd, &tty) != 0)
+        {
+                printf ("error %d from tcgetattr", errno);
+                return -1;
+        }
+
+        cfsetospeed (&tty, speed);
+        cfsetispeed (&tty, speed);
+
+        tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
+        
+        if (tcsetattr (fd, TCSANOW, &tty) != 0)
+        {
+                printf ("error %d from tcsetattr", errno);
+                return -1;
+        }
+        return 0;
 }
