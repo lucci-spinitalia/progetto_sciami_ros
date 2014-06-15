@@ -44,7 +44,11 @@ extern "C" {
 /*******************************************/
 
 ///\brief	TO USE DATA FROM THE GYRO LOOKUPTABLE
+<<<<<<< HEAD
 //#define                 USE_GYRO_TABLE		1
+=======
+#define                 USE_GYRO_TABLE		1
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 
 //====================================
 

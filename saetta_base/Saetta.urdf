@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<robot name="Saetta">
+  <link name="base_link">
+  </link>
+
+  <link name="body">
+    <visual>
+      <geometry>
+        <box size="0.195 0.145 0.055"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.032"/>
+      <material name="grey">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="cover">
+    <visual>
+      <geometry>
+        <box size="0.195 0.145 0.02"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.069"/>
+      <material name="dark_transparent_grey">
+        <color rgba="0.2 0.2 0.2 0.5"/>
+      </material>
+    </visual>
+  </link>
+
+
+  <link name="right_wheel">
+    <visual>
+      <geometry>
+        <cylinder radius="0.032" length=".007"/>
+      </geometry>
+      <origin rpy="0 1.57075 1.57075" xyz="0 -0.085 0.032"/>
+      <material name="wheel_metal">
+        <color rgba="0.7 0.6 0.6 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="left_wheel">
+    <visual>
+      <geometry>
+        <cylinder radius="0.032" length=".007"/>
+      </geometry>
+      <origin rpy="0 1.57075 1.57075" xyz="0 0.085 0.032"/>
+      <material name="wheel_metal"/>
+    </visual>
+  </link>
+
+  <link name="castor_support">
+    <visual>
+      <geometry>
+        <box size="0.05 0.027 0.02"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0.1225 0 0.02"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="castor_wheel">
+    <visual>
+      <geometry>
+        <sphere radius="0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0.1225 0 0.01"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <link name="sensor_front_left">
+    <visual>
+      <geometry>
+        <box size="0.03 0.022 0.01"/>
+      </geometry>
+      <origin rpy="0 1.57075 1.30915" xyz="0.082 -0.08 0.032"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <link name="sensor_front">
+    <visual>
+      <geometry>
+        <box size="0.03 0.022 0.01"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0.11 0 0.05"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+
+  <link name="sensor_front_right">
+    <visual>
+      <geometry>
+        <box size="0.03 0.022 0.01"/>
+      </geometry>
+      <origin rpy="0 1.57075 1.83235" xyz="0.082 0.08 0.032"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <link name="sensor_rear_right">
+    <visual>
+      <geometry>
+        <box size="0.03 0.022 0.01"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="-0.082 -0.08 0.032"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+
+  <link name="sensor_rear_left">
+    <visual>
+      <geometry>
+        <box size="0.03 0.022 0.01"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="-0.082 0.08 0.032"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <joint name="body_to_cover" type="fixed">
+    <parent link="body"/>
+    <child link="cover"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <joint name="body_to_right_wheel" type="fixed">
+    <parent link="body"/>
+    <child link="right_wheel"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <joint name="body_to_left_wheel" type="fixed">
+    <parent link="body"/>
+    <child link="left_wheel"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <joint name="body_to_castor_support" type="fixed">
+    <parent link="body"/>
+    <child link="castor_support"/>
+    <origin xyz=" 0 0 0"/>
+  </joint>
+
+  <joint name="castor_support_to_castor_wheel" type="fixed">
+    <parent link="castor_support"/>
+    <child link="castor_wheel"/>
+    <origin xyz=" 0 0 0"/>
+  </joint>
+
+  <joint name="base_to_body" type="fixed">
+    <parent link="base_link"/>
+    <child link="body"/>
+    <origin xyz=" 0 0 0"/>
+  </joint>
+
+  <joint name="body_to_FL_sensor" type="fixed">
+    <parent link="body"/>
+    <child link="sensor_front_left"/>
+    <origin xyz=" 0 0 0"/>
+  </joint>
+
+  <joint name="body_to_F_sensor" type="fixed">
+    <parent link="body"/>
+    <child link="sensor_front"/>
+    <origin xyz=" 0 0 0"/>
+  </joint>
+
+  <joint name="body_to_FR_sensor" type="fixed">
+    <parent link="body"/>
+    <child link="sensor_front_right"/>
+    <origin xyz=" 0 0 0"/>
+  </joint>
+
+
+  <joint name="body_to_RL_sensor" type="fixed">
+    <parent link="body"/>
+    <child link="sensor_rear_left"/>
+    <origin xyz=" 0 0 0"/>
+  </joint>
+
+  <joint name="body_to_RR_sensor" type="fixed">
+    <parent link="body"/>
+    <child link="sensor_rear_right"/>
+    <origin xyz=" 0 0 0"/>
+  </joint>
+
+
+</robot>
+

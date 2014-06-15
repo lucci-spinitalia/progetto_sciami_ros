@@ -334,9 +334,7 @@ int get_odometria(unsigned char* payload, int l, int *p_m1, int *p_m2, int *s1, 
     //printf("valore: %d flag: %d %d\n", *(payload+j), ((*(payload+j)-0x2E)&2)>>1,(*(payload+j)-0x2E)&1);
     j++;
     //----
-#if(PIC_LOG_TO_SCREEN == 1)
     printf("Pack: %d %d\n", *p_m1,*p_m2);
-#endif
     contatore = ~contatore;
 	
     contatore++;
@@ -532,9 +530,7 @@ int analizza_pacchetto_init()
 	//	buffer_size=2;     
 	while (c_aux < buffer_size - 1)
     {
-#if (PIC_LOG_TO_SCREEN == 1)
 		printf("c_aux: %d\n",c_aux);
-#endif
 		
 		code = (unsigned int) *(pic_message_buffer[0] + c_aux);
 		
@@ -543,14 +539,12 @@ int analizza_pacchetto_init()
 				
 				//______________________ START ___________________________________________________
 			case PACKET_START_HEADER:
-#if (PIC_LOG_TO_SCREEN == 1)
 				printf("PACKET_START_HEADER\n");
-#endif
 				if (steps_anomaly == 1)
 				{
 					write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
-//					sync();
-//					tcflush(pic_fd, TCOFLUSH);
+					sync();
+					tcflush(pic_fd, TCOFLUSH);
 #ifdef VERBOSE
 					printf("R\n");
 #endif
@@ -580,20 +574,20 @@ int analizza_pacchetto_init()
 							step2vel(vel1,vel2,&last_v_ref,&last_w_ref);
 							
 							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
+							sync();
 							break;
 						case PACKET_SERVOING_HEADER:
 							printf("--PACKET_SERVOING_HEADER\n");
 							write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SERVOING_LENGTH + 1);
 							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
+							sync();
 							break;
 						default:
 							printf("--DEFAULT CASE\n");
 							write(pic_fd, pic_message_timing, PACKET_TIMING_LENGTH + 1);
 							// a scanso di equivoci...
 							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
+							sync();
 							//tcflush(pic_fd, TCOFLUSH);
 							break;
 					}
@@ -613,11 +607,7 @@ int analizza_pacchetto_init()
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}}
-=======
 				else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 				//ir->is_valid=FALSE;
 				pthread_mutex_unlock(&mutex_fp);
 #else
@@ -637,11 +627,7 @@ int analizza_pacchetto_init()
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}}
-=======
 				else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 				//ir->is_valid=FALSE;
 				pthread_mutex_unlock(&mutex_fp);
 #else
@@ -661,11 +647,7 @@ int analizza_pacchetto_init()
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);print_sensore(acc);}
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}}
-=======
 				else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				if (acc->is_valid == TRUE){print_sensore(acc);}
@@ -692,11 +674,7 @@ int analizza_pacchetto_init()
 				pthread_mutex_lock(&mutex_fp);
 				if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);}//print_sensore(acc);
 				if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}//print_sensore(magneto);
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}}
-=======
 				else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				if (acc->is_valid == TRUE){print_sensore(acc);}
@@ -718,11 +696,7 @@ int analizza_pacchetto_init()
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}}
-=======
 				else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				//if (magneto->is_valid == TRUE){print_sensore(magneto);}
@@ -739,12 +713,8 @@ int analizza_pacchetto_init()
 				c_aux += get_gyro_integral((pic_message_buffer[0]) + c_aux, PACKET_GYRO_INTEGRAL_LENGTH, &gyro_integral_pic, &controllo_dati);
 				if(controllo_dati==1){
 					
-					if(abs(gyro_integral_pic)>16){gyro_sup_integral+=((float)gyro_integral_pic)/1024;}
-<<<<<<< HEAD
-					if (fp_log!=NULL){fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);}
-=======
+					if(modulo(gyro_integral_pic)>16){gyro_sup_integral+=((float)gyro_integral_pic)/1024;}
 					fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 				}
 				else{printf("INTEGRALE SBAGLIATO\n");}
 				//			printf("ANGLE: %f\n", gyro_sup_integral);
@@ -758,8 +728,8 @@ int analizza_pacchetto_init()
 				gyro->is_valid =FALSE;
 				pthread_mutex_lock(&mutex_gyro);
 				c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_GYRO_LENGTH, gyro, &controllo_dati);
-#ifdef USE_GYRO_TABLE
 				if(gyro->is_valid==TRUE){
+#ifdef USE_GYRO_TABLE
 					for(i=0;i<gyro->num_canali;i++)	{
 						if(*(gyro->range+i)>=gyro_table_min_index && *(gyro->range+i)<=gyro_table_max_index){				
 							*(gyro->converted+i)=*(gyro_table_value+(*(gyro->range+i)-gyro_table_min_index+(gyro_table_nominal_zero-	gyro_table_effective_zero))); 
@@ -778,11 +748,7 @@ int analizza_pacchetto_init()
 				pthread_mutex_lock(&mutex_fp);
 				
 				if (gyro->is_valid == TRUE){print_sensore_on_file(gyro, fp_log);}
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}}
-=======
 				else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				//if (gyro->is_valid == TRUE){print_sensore(gyro);}
@@ -817,9 +783,7 @@ int analizza_pacchetto_init()
 				 //if (controllo_dati != 1) {printf("ERR_MAGNETO\n");}
 				 break;*/
 			case PACKET_GYRO_OFFSET_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
 				printf("PACKET_GYRO_OFFSET_HEADER\n");
-#endif
 				c_aux += get_offset_sensore((pic_message_buffer[0]) + c_aux, PACKET_GYRO_LENGTH, gyro, &controllo_dati);
 				if (gyro->is_valid == TRUE)
 				{
@@ -835,9 +799,7 @@ int analizza_pacchetto_init()
 				break;
 				
 			case PACKET_ODOM_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
 				printf("PACKET_ODOM_HEADER\n");
-#endif
 				steps_done[0] = 0;
 				steps_done[1] = 0;
 				c_aux += get_odometria((pic_message_buffer[0]) + c_aux, PACKET_ODOM_LENGTH, &(steps_done[0]), &(steps_done[1]), &(sign_motors[0]), &(sign_motors[1]), &controllo_dati);
@@ -918,11 +880,7 @@ int analizza_pacchetto_init()
 						}
 						else
 						{
-<<<<<<< HEAD
-							if (fp_log!=NULL){fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);}
-=======
 							fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 						}
 						pthread_mutex_unlock(&mutex_fp);
 						
@@ -944,17 +902,11 @@ int analizza_pacchetto_init()
 #ifdef VERBOSE
 					printf("NOLOG\n");
 #endif
-<<<<<<< HEAD
-					if (fp_log!=NULL){fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);}
-=======
 					fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 				}
 				break;
 			case PACKET_ERRPIC_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
 				printf("PACKET_ERRPIC_HEADER\n");
-#endif
 				steps_done[0]=0;
 				steps_done[1]=0;
 				++num_packet_sent_wrong;
@@ -986,11 +938,7 @@ int analizza_pacchetto_init()
     if (controllo_dati == 1 && buffer_size>0)
     {
 		pthread_mutex_lock(&mutex_fp);
-<<<<<<< HEAD
-		if (fp_log!=NULL){fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);}
-=======
 		fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 		//if (buffer_size<8)
 		//{
 		//    stampa_pacchetto((*pic_message_buffer), buffer_size);
@@ -1002,11 +950,7 @@ int analizza_pacchetto_init()
     else
     {
 		pthread_mutex_lock(&mutex_fp);
-<<<<<<< HEAD
-		if (fp_log!=NULL){fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);}
-=======
 		fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 		printf("-----------------------------------------------------------------\n");
 		pthread_mutex_unlock(&mutex_fp);
 		clock_counter++;
@@ -1029,532 +973,428 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
     int controllo_dati = 1;
     unsigned int code;
     unsigned int i;
+int ii;	
+   memcpy(pic_message_buffer[0],buf,buffer_size);
 
-    memcpy(pic_message_buffer[0],buf,buffer_size);
-
+//___________________________________________________
+	//printf("Ok!\n");
+    //stampa_pacchetto((*pic_message_buffer), buffer_size);
     while (c_aux < buffer_size - 1)
     {
-#if (PIC_LOG_TO_SCREEN == 1)
-		printf("c_aux: %d\n",c_aux);
+
+
+	code = (unsigned int) *(pic_message_buffer[0] + c_aux);
+
+	switch (code)
+	{
+
+	//______________________ START ___________________________________________________
+	case PACKET_START_HEADER:
+
+	    if (steps_anomaly == 1)
+	    {
+		write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
+		sync();
+		tcflush(pic_fd, TCOFLUSH);
+#ifdef VERBOSE
+		printf("R\n");
 #endif
-		
-		code = (unsigned int) *(pic_message_buffer[0] + c_aux);
-		
-		switch (code)
+		//steps_done[0]=0;steps_done[1]=0;delta_passi[0]=0;delta_passi[1]=0;
+		steps_anomaly = 0;
+	    }
+	    else
+	    {
+		switch (*(pic_buffer[pic_last_vel_2_write]))
 		{
-				
-				//______________________ START ___________________________________________________
-			case PACKET_START_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_START_HEADER\n");
-#endif
-				if (steps_anomaly == 1)
-				{
-					write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
-//					sync();
-//					tcflush(pic_fd, TCOFLUSH);
-#ifdef VERBOSE
-					printf("R\n");
-#endif
-					//steps_done[0]=0;steps_done[1]=0;delta_passi[0]=0;delta_passi[1]=0;
-					steps_anomaly = 0;
-				}
-				else
-				{
-					switch (*(pic_buffer[pic_last_vel_2_write]))
-					{
-							
-						case PACKET_SPEED_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-							printf("--PACKET_SPEED_HEADER\n");
-#endif
-							write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SPEED_LENGTH + 1);
-							unsigned char *p;
-							int vel1, vel2;
-							p = (unsigned char *) *(pic_buffer+pic_last_vel_2_write);
-							
-							vel1 = (*(p+4)<<8) | *(p+3);
-							vel1 = MAX_VEL - vel1;
-							vel1 = *(p+1)?-vel1:vel1;
-							
-							vel2 = (*(p+6)<<8) | *(p+5);
-							vel2 = MAX_VEL - vel2;
-							vel2 = *(p+2)?-vel2:vel2;
-							
-							step2vel(vel1,vel2,&last_v_ref,&last_w_ref);
-							
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
-							break;
-						case PACKET_SERVOING_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-							printf("--PACKET_SERVOING_HEADER\n");
-#endif
-							write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SERVOING_LENGTH + 1);
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
-							break;
-						default:
-#if(PIC_LOG_TO_SCREEN == 1)
-							printf("--DEFAULT CASE\n");
-#endif
-							write(pic_fd, pic_message_timing, PACKET_TIMING_LENGTH + 1);
-							// a scanso di equivoci...
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
-							//tcflush(pic_fd, TCOFLUSH);
-							break;
-					}
-				}
-				c_aux = buffer_size;
-				return START_PACKET_ANALYZED;
-				break;
-				//_____________________________________________________________________________________________
-				
-				//______________________ DISTANCE ___________________________________________________
-			case PACKET_DISTANCE_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_DISTANCE_HEADER\n");
-#endif
-				++ad_minc;
-				pthread_mutex_lock(&mutex_ir);
-				//ir->is_valid =	FALSE;
-				c_aux += get_distanza((pic_message_buffer[0]) + c_aux, PACKET_DISTANCE_LENGTH, ir, &controllo_dati);
-#ifdef LOG_SU_FILE
-				pthread_mutex_lock(&mutex_fp);
-				if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}}
-=======
-				else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-				//ir->is_valid=FALSE;
-				pthread_mutex_unlock(&mutex_fp);
-#else
-				if (ir->is_valid == TRUE){print_sensore(ir);}
-#endif
-				pthread_mutex_unlock(&mutex_ir);
-				break;
-				//_____________________________________________________________________________________________
-				
-				//______________________ IR ___________________________________________________
-			case PACKET_IR_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_IR_HEADER\n");
-#endif
-				++ad_minc;
-				pthread_mutex_lock(&mutex_ir);
-				ir->is_valid =	FALSE;
-				c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_IR_LENGTH, ir, &controllo_dati);
-#ifdef LOG_SU_FILE
-				pthread_mutex_lock(&mutex_fp);
-				if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}}
-=======
-				else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-				//ir->is_valid=FALSE;
-				pthread_mutex_unlock(&mutex_fp);
-#else
-				if (ir->is_valid == TRUE){print_sensore(ir);}
-#endif
-				pthread_mutex_unlock(&mutex_ir);
-				break;
-				//_____________________________________________________________________________________________
-				
-				//______________________ ACC ___________________________________________________
-			case PACKET_ACC_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_ACC_HEADER\n");
-#endif
-				//printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
-				pthread_mutex_lock(&mutex_acc);
-				acc->is_valid =FALSE;
-				c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_ACC_LENGTH, acc, &controllo_dati);
-#ifdef LOG_SU_FILE
-				pthread_mutex_lock(&mutex_fp);
-				if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);print_sensore(acc);}
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}}
-=======
-				else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-				pthread_mutex_unlock(&mutex_fp);
-#else
-				if (acc->is_valid == TRUE){print_sensore(acc);}
-#endif
-				//if (acc->is_valid == TRUE){print_sensore(acc);}
-				pthread_mutex_unlock(&mutex_acc);
-				break;
-				//_____________________________________________________________________________________________
-				
-				
-				
-				
-				//______________________ MAGACC ___________________________________________________
-			case PACKET_MAGACC_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_MAGACC_HEADER\n");
-#endif
-				//printf("**************************************\n");
-				//printf("**************************************\n");
-				//printf("**************************************\n");
-				pthread_mutex_lock(&mutex_acc);
-				pthread_mutex_lock(&mutex_magneto);
-				acc->is_valid =FALSE;
-				c_aux += get_magacc((pic_message_buffer[0]) + c_aux, PACKET_ACC_LENGTH, acc, &controllo_dati);
-#ifdef LOG_SU_FILE
-				pthread_mutex_lock(&mutex_fp);
-				if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);}//print_sensore(acc);
-				if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}//print_sensore(magneto);
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}}
-=======
-				else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-				pthread_mutex_unlock(&mutex_fp);
-#else
-				if (acc->is_valid == TRUE){print_sensore(acc);}
-#endif
-				//if (acc->is_valid == TRUE){print_sensore(acc);}
-				pthread_mutex_unlock(&mutex_acc);
-				pthread_mutex_unlock(&mutex_magneto);
-				break;
-				//_____________________________________________________________________________________________
-				
-				
-				
-				//______________________ MAGNETO ___________________________________________________
-			case PACKET_MAGNETO_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_MAGNETO_HEADER\n");
-#endif
-				pthread_mutex_lock(&mutex_magneto);
-				magneto->is_valid =FALSE;
-				c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_MAGNETO_LENGTH-1, magneto, &controllo_dati);
-#ifdef LOG_SU_FILE
-				pthread_mutex_lock(&mutex_fp);
-				if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}}
-=======
-				else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-				pthread_mutex_unlock(&mutex_fp);
-#else
-				//if (magneto->is_valid == TRUE){print_sensore(magneto);}
-#endif
-				//if (magneto->is_valid == TRUE){print_sensore(magneto);}
-				pthread_mutex_unlock(&mutex_magneto);
-				break;
-				//_____________________________________________________________________________________________
-				
-				
-				//______________________ GYRO INTEGRAL ___________________________________________________
-			case PACKET_GYRO_INTEGRAL_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_GYRO_INTEGRAL_HEADER\n");
-#endif
-				c_aux += get_gyro_integral((pic_message_buffer[0]) + c_aux, PACKET_GYRO_INTEGRAL_LENGTH, &gyro_integral_pic, &controllo_dati);
-				if(controllo_dati==1){
-					
-					if(abs(gyro_integral_pic)>16){gyro_sup_integral+=((float)gyro_integral_pic)/1024;}
-<<<<<<< HEAD
-					if (fp_log!=NULL){fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);}
-=======
-					fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-				}
-				else{printf("INTEGRALE SBAGLIATO\n");}
-				//			printf("ANGLE: %f\n", gyro_sup_integral);
-				break;
-				//_____________________________________________________________________________________________
-				
-				
-				//______________________ GYRO ___________________________________________________
-			case PACKET_GYRO_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_GYRO_HEADER\n");
-#endif
-				gyro->is_valid =FALSE;
-				pthread_mutex_lock(&mutex_gyro);
-				c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_GYRO_LENGTH, gyro, &controllo_dati);
-#ifdef USE_GYRO_TABLE
-				if(gyro->is_valid==TRUE){
-					for(i=0;i<gyro->num_canali;i++)	{
-						if(*(gyro->range+i)>=gyro_table_min_index && *(gyro->range+i)<=gyro_table_max_index){				
-							*(gyro->converted+i)=*(gyro_table_value+(*(gyro->range+i)-gyro_table_min_index+(gyro_table_nominal_zero-	gyro_table_effective_zero))); 
-						}
-						else{*(gyro->converted+i)=-10.0;}
-					}
-					
-					// it is worth to note that in case of bad measure the  last usefull element is integrated:
-					// this portion of code runs only when the gyro sensor measure is vald (gyro->is_valid==TRUE )
-					//printf("W_GYRO: %d %f, %f\n",*(gyro->range+1),*(gyro->converted+1), gyro_integral);
-				}
-				gyro_integral=gyro_integral+*(gyro->converted+1)*T;
-				//printf("lettura: %d\n",*(gyro->range+1));
-#endif
-#ifdef LOG_SU_FILE
-				pthread_mutex_lock(&mutex_fp);
-				
-				if (gyro->is_valid == TRUE){print_sensore_on_file(gyro, fp_log);}
-<<<<<<< HEAD
-				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}}
-=======
-				else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-				pthread_mutex_unlock(&mutex_fp);
-#else
-				//if (gyro->is_valid == TRUE){print_sensore(gyro);}
-#endif
-				pthread_mutex_unlock(&mutex_gyro);
-				break;
-				//_____________________________________________________________________________________________
-				
-				//______________________ ACK ___________________________________________________
-				
-			case PACKET_ACK_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_ACK_HEADER\n");
-#endif
-				c_aux += PACKET_ACK_LENGTH;
-				pthread_mutex_lock(&mutex_fp);
-				pthread_mutex_unlock(&mutex_fp);
-				break;
-				//_____________________________________________________________________________________________
-			case PACKET_SERVOING_FEEDBACK_HEADER:
-				c_aux += get_servoing_feedback((pic_message_buffer[0]) + c_aux, PACKET_SERVOING_FEEDBACK_LENGTH, &(riferimenti_servoing[0]), &(riferimenti_servoing[1]), &controllo_dati);
-				//flag utile per calibrazione
-				flag_servoing_completed = 1;
-				//if (controllo_dati != 1) {printf("ERR_SERV_FEED\n");}
-				
-				break;
-				
-				/*case PACKET_MAG_OFFSET_HEADER:
-				 c_aux += get_offset_sensore((pic_message_buffer[0]) + c_aux, PACKET_MAGNETO_LENGTH, magneto, &controllo_dati);
-				 if (magneto->is_valid == TRUE)
-				 {
-				 print_sensore(magneto);
-				 }
-				 //if (controllo_dati != 1) {printf("ERR_MAGNETO\n");}
-				 break;*/
-			case PACKET_GYRO_OFFSET_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_GYRO_OFFSET_HEADER\n");
-#endif
-				c_aux += get_offset_sensore((pic_message_buffer[0]) + c_aux, PACKET_GYRO_LENGTH, gyro, &controllo_dati);
-				if (gyro->is_valid == TRUE)
-				{
-					print_sensore(gyro);
-				}
-				printf("------------------------------------------------------------\n");
-				printf("------------------------------------------------------------\n");
-				printf("------------------------------------------------------------\n");
-				printf("------------------------------------------------------------\n");
-				printf("------------------------------------------------------------\n");
-				
-				//if (controllo_dati != 1) {printf("ERR_MAGNETO\n");}
-				break;
-				
-			case PACKET_ODOM_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_ODOM_HEADER\n");
-#endif
-				steps_done[0] = 0;
-				steps_done[1] = 0;
-				c_aux += get_odometria((pic_message_buffer[0]) + c_aux, PACKET_ODOM_LENGTH, &(steps_done[0]), &(steps_done[1]), &(sign_motors[0]), &(sign_motors[1]), &controllo_dati);
-				
-				//if (controllo_dati != 1) {
-				//    //printf("ERR_ODOM\n");
-				//    break;
-				//}
-				if (controllo_dati == 1)
-				{
-					if (steps_done[0] >= delta_passi[0])
-					{
-						delta_passi[0] = steps_done[0] - delta_passi[0];
-					}
-					else
-					{
-						delta_passi[0] = MAX_STEPS_COUNTER - delta_passi[0] + steps_done[0];
-					}
-					
-					if (steps_done[1] >= delta_passi[1])
-					{
-						delta_passi[1] = steps_done[1] - delta_passi[1];
-					}
-					else
-					{
-						delta_passi[1] = MAX_STEPS_COUNTER - delta_passi[1] + steps_done[1];
-					}
-					
-					
-					if (delta_passi[0] > THRESHOLD_STEPS_COUNTER || delta_passi[1] > THRESHOLD_STEPS_COUNTER)
-					{
-						
-						steps_done[0]=0;
-						steps_done[1]=0;
-						delta_passi[0]=0;
-						delta_passi[1]=0;
-						steps_anomaly = 1;
-#ifdef VERBOSE
-						
-						printf("ANOMALIA\n");
-#endif
-					}
-					else
-					{
-						//delta_passi[0]=steps_done[0]-delta_passi[0];
-						//delta_passi[1]=steps_done[1]-delta_passi[1];
-						//printf("P1: %d %d\n", delta_passi[0],delta_passi[1]);
-						//printf("SEGNI: %d %d\n", sign_motors[0],sign_motors[1]);
-						delta_passi[0] *= sign_motors[0];
-						delta_passi[1] *= sign_motors[1];
-						
-						pthread_mutex_lock(&mutex_state);
-						get_state(&(delta_passi[0]), &(delta_passi[1]), state[STATE_THETA], &(delta_state[0]));
-						
-						state[STATE_X] += delta_state[STATE_X];
-						state[STATE_Y] += delta_state[STATE_Y];
-						state[STATE_THETA] += delta_state[STATE_THETA];
-						//printf("Delta theta = %6.2f\nTheta: %6.2f\n", delta_state[STATE_THETA], state[STATE_THETA]);
-						if (state[STATE_THETA] > M_PI)
-						{
-							state[STATE_THETA] -= (2 * M_PI);
-						}
-						if (state[STATE_THETA]<-M_PI)
-						{
-							state[STATE_THETA] += (2 * M_PI);
-						}
-						
-						pthread_mutex_unlock(&mutex_state);
-#ifdef VERBOSE
-						//printf("STATO: %f %f %f\n", state[STATE_X], state[STATE_Y], state[STATE_THETA]);
-#endif
-						//printf("A: %d %d\n", steps_done[0],steps_done[1]);
-#ifdef LOG_SU_FILE
-						
-						pthread_mutex_lock(&mutex_fp);
-<<<<<<< HEAD
-                                                if (fp_log != NULL) {
-                                                    if (controllo_dati == TRUE)
-                                                    {
-                                                            print_odometria(fp_log, &state[0], &(steps_done[0]));
-                                                    }
-                                                    else
-                                                    {
-                                                            fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
-                                                    }
-                                                }
-=======
-						if (controllo_dati == TRUE)
-						{
-							print_odometria(fp_log, &state[0], &(steps_done[0]));
-						}
-						else
-						{
-							fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
-						}
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-						pthread_mutex_unlock(&mutex_fp);
-						
-#else
-#if(PIC_LOG_TO_SCREEN == 1)
-						printf("%f %f %f\n", state[STATE_X], state[STATE_Y], state[STATE_THETA]);
-#endif
-						//printf("P: %d %d\n", delta_passi[0], delta_passi[1]);
-						//printf("A: %d %d\n", steps_done[0], steps_done[1]);
-						//printf("D: %f %f %f\n", delta_state[STATE_X],delta_state[STATE_Y],delta_state[STATE_THETA]);
-#endif
-						//printf("%f %f %f\n", state[STATE_X], state[STATE_Y], state[STATE_THETA]);
-						delta_passi[0] = steps_done[0];
-						delta_passi[1] = steps_done[1];
-					}
-					
-					
-				}
-				else
-				{
-#ifdef VERBOSE
-					printf("NOLOG\n");
-<<<<<<< HEAD
-#endif                                  if (fp_log!=NULL){ fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);}
-                                        
-=======
-#endif
-					fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-				}
-				break;
-			case PACKET_ERRPIC_HEADER:
-#if(PIC_LOG_TO_SCREEN == 1)
-				printf("PACKET_ERRPIC_HEADER\n");
-#endif
-				steps_done[0]=0;
-				steps_done[1]=0;
-				++num_packet_sent_wrong;
-				c_aux += PACKET_ERRPIC_LENGTH;
-				//printf("e\n");
-				break;
-			default:
-#ifdef VERBOSE
-				printf("NC: c_aux %d    buffer_size %d code: %02x\n", c_aux, buffer_size, code);
-				
-#endif
-				//stampa_pacchetto(*pic_message_buffer, buffer_size);
-				//printf("ERR: %02x n %d\n", code, c_aux);
-				++num_packet_data_wrong;
-				controllo_dati = 0;
-				pthread_mutex_lock(&mutex_fp);
-				//fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);
-				//fprintf(fp_log, "\nN%d\n", ++num_packet_data_ok);
-				pthread_mutex_unlock(&mutex_fp);
-				return ERROR_PACKET_ANALYZED;
-				
+
+		case PACKET_SPEED_HEADER:
+		    write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SPEED_LENGTH + 1);
+		    *(pic_buffer[pic_last_vel_2_write]) = 0;
+		    sync();
+		    break;
+		case PACKET_SERVOING_HEADER:
+		    write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SERVOING_LENGTH + 1);
+		    *(pic_buffer[pic_last_vel_2_write]) = 0;
+		    sync();
+		    break;
+		default:
+		    write(pic_fd, pic_message_timing, PACKET_TIMING_LENGTH + 1);
+		    // a scanso di equivoci...
+		    *(pic_buffer[pic_last_vel_2_write]) = 0;
+		    sync();
+		    //tcflush(pic_fd, TCOFLUSH);
+		    break;
 		}
-		//stampa_pacchetto(barile, buffer_size);
+	    }
+	    c_aux = buffer_size;
+	    return START_PACKET_ANALYZED;
+	    break;
+	//_____________________________________________________________________________________________
+
+	//______________________ DISTANCE ___________________________________________________
+	case PACKET_DISTANCE_HEADER:
+	    ++ad_minc;
+	    pthread_mutex_lock(&mutex_ir);
+	    ir->is_valid =	FALSE;
+	    c_aux += get_distanza((pic_message_buffer[0]) + c_aux, PACKET_DISTANCE_LENGTH, ir, &controllo_dati);
+#ifdef LOG_SU_FILE
+	    pthread_mutex_lock(&mutex_fp);
+	    if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
+	    else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
+		//ir->is_valid=FALSE;
+	    pthread_mutex_unlock(&mutex_fp);
+#else
+	    if (ir->is_valid == TRUE){print_sensore(ir);}
+#endif
+	    pthread_mutex_unlock(&mutex_ir);
+	    break;
+	//_____________________________________________________________________________________________
+
+	//______________________ IR ___________________________________________________
+	case PACKET_IR_HEADER:
+
+	    ++ad_minc;
+	    pthread_mutex_lock(&mutex_ir);
+	    ir->is_valid =	FALSE;
+	    c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_IR_LENGTH, ir, &controllo_dati);
+#ifdef LOG_SU_FILE
+	    pthread_mutex_lock(&mutex_fp);
+	    if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
+	    else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
+		//ir->is_valid=FALSE;
+	    pthread_mutex_unlock(&mutex_fp);
+#else
+	    if (ir->is_valid == TRUE){print_sensore(ir);}
+#endif
+	    pthread_mutex_unlock(&mutex_ir);
+	    break;
+	//_____________________________________________________________________________________________
+
+	//______________________ ACC ___________________________________________________
+	case PACKET_ACC_HEADER:
+			//printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+	    pthread_mutex_lock(&mutex_acc);
+	    acc->is_valid =FALSE;
+	    c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_ACC_LENGTH, acc, &controllo_dati);
+#ifdef LOG_SU_FILE
+	    pthread_mutex_lock(&mutex_fp);
+	    if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);print_sensore(acc);}
+	    else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
+	    pthread_mutex_unlock(&mutex_fp);
+#else
+	    if (acc->is_valid == TRUE){print_sensore(acc);}
+#endif
+	    //if (acc->is_valid == TRUE){print_sensore(acc);}
+	    pthread_mutex_unlock(&mutex_acc);
+	    break;
+		//_____________________________________________________________________________________________
+
+
+
+
+	//______________________ MAGACC ___________________________________________________
+	case PACKET_MAGACC_HEADER:
+			//printf("**************************************\n");
+			//printf("**************************************\n");
+			//printf("**************************************\n");
+	    pthread_mutex_lock(&mutex_acc);
+			pthread_mutex_lock(&mutex_magneto);
+	    acc->is_valid =FALSE;
+	    c_aux += get_magacc((pic_message_buffer[0]) + c_aux, PACKET_ACC_LENGTH, acc, &controllo_dati);
+#ifdef LOG_SU_FILE
+	    pthread_mutex_lock(&mutex_fp);
+	    if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);}//print_sensore(acc);
+			if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}//print_sensore(magneto);
+	    else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
+	    pthread_mutex_unlock(&mutex_fp);
+#else
+	    if (acc->is_valid == TRUE){print_sensore(acc);}
+#endif
+	    //if (acc->is_valid == TRUE){print_sensore(acc);}
+	    pthread_mutex_unlock(&mutex_acc);
+			pthread_mutex_unlock(&mutex_magneto);
+	    break;
+		//_____________________________________________________________________________________________
+
+
+
+	//______________________ MAGNETO ___________________________________________________
+	case PACKET_MAGNETO_HEADER:
+
+	    pthread_mutex_lock(&mutex_magneto);
+	    magneto->is_valid =FALSE;
+	    c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_MAGNETO_LENGTH-1, magneto, &controllo_dati);
+#ifdef LOG_SU_FILE
+	    pthread_mutex_lock(&mutex_fp);
+	    if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}
+	    else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
+	    pthread_mutex_unlock(&mutex_fp);
+#else
+	    //if (magneto->is_valid == TRUE){print_sensore(magneto);}
+#endif
+			//if (magneto->is_valid == TRUE){print_sensore(magneto);}
+	    pthread_mutex_unlock(&mutex_magneto);
+	    break;
+		//_____________________________________________________________________________________________
+
+
+	//______________________ GYRO INTEGRAL ___________________________________________________
+	case PACKET_GYRO_INTEGRAL_HEADER:
+
+	    c_aux += get_gyro_integral((pic_message_buffer[0]) + c_aux, PACKET_GYRO_INTEGRAL_LENGTH, &gyro_integral_pic, &controllo_dati);
+			if(controllo_dati==1){
 		
-		
+				if(modulo(gyro_integral_pic)>16){gyro_sup_integral+=((float)gyro_integral_pic)/1024;}
+				fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);
+			}
+			else{printf("INTEGRALE SBAGLIATO\n");}
+//			printf("ANGLE: %f\n", gyro_sup_integral);
+	    break;
+		//_____________________________________________________________________________________________
+
+
+	//______________________ GYRO ___________________________________________________
+	case PACKET_GYRO_HEADER:
+	    gyro->is_valid =FALSE;
+	    pthread_mutex_lock(&mutex_gyro);
+	    c_aux += get_sensore((pic_message_buffer[0]) + c_aux, PACKET_GYRO_LENGTH, gyro, &controllo_dati);
+			if(gyro->is_valid==TRUE){
+#ifdef USE_GYRO_TABLE
+				for(i=0;i<gyro->num_canali;i++)	{
+					if(*(gyro->range+i)>=gyro_table_min_index && *(gyro->range+i)<=gyro_table_max_index){				
+						*(gyro->converted+i)=*(gyro_table_value+(*(gyro->range+i)-gyro_table_min_index+(gyro_table_nominal_zero-	gyro_table_effective_zero))); 
+					}
+					else{*(gyro->converted+i)=-10.0;}
+				}
+
+				// it is worth to note that in case of bad measure the  last usefull element is integrated:
+				// this portion of code runs only when the gyro sensor measure is vald (gyro->is_valid==TRUE )
+				//printf("W_GYRO: %d %f, %f\n",*(gyro->range+1),*(gyro->converted+1), gyro_integral);
+			}
+			gyro_integral=gyro_integral+*(gyro->converted+1)*T;
+			//printf("lettura: %d\n",*(gyro->range+1));
+#endif
+#ifdef LOG_SU_FILE
+	    pthread_mutex_lock(&mutex_fp);
+
+	    if (gyro->is_valid == TRUE){print_sensore_on_file(gyro, fp_log);}
+	    else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
+	    pthread_mutex_unlock(&mutex_fp);
+#else
+	    //if (gyro->is_valid == TRUE){print_sensore(gyro);}
+#endif
+	    pthread_mutex_unlock(&mutex_gyro);
+	    break;
+		//_____________________________________________________________________________________________
+
+	//______________________ ACK ___________________________________________________
+
+	case PACKET_ACK_HEADER:
+	    c_aux += PACKET_ACK_LENGTH;
+	    pthread_mutex_lock(&mutex_fp);
+	    pthread_mutex_unlock(&mutex_fp);
+	    break;
+		//_____________________________________________________________________________________________
+	case PACKET_SERVOING_FEEDBACK_HEADER:
+	    c_aux += get_servoing_feedback((pic_message_buffer[0]) + c_aux, PACKET_SERVOING_FEEDBACK_LENGTH, &(riferimenti_servoing[0]), &(riferimenti_servoing[1]), &controllo_dati);
+	    //flag utile per calibrazione
+	    flag_servoing_completed = 1;
+	    //if (controllo_dati != 1) {printf("ERR_SERV_FEED\n");}
+
+	    break;
+
+	/*case PACKET_MAG_OFFSET_HEADER:
+	    c_aux += get_offset_sensore((pic_message_buffer[0]) + c_aux, PACKET_MAGNETO_LENGTH, magneto, &controllo_dati);
+	    if (magneto->is_valid == TRUE)
+	    {
+		print_sensore(magneto);
+	    }
+	    //if (controllo_dati != 1) {printf("ERR_MAGNETO\n");}
+	    break;*/
+	case PACKET_GYRO_OFFSET_HEADER:
+
+			printf("qua !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+	    c_aux += get_offset_sensore((pic_message_buffer[0]) + c_aux, PACKET_GYRO_LENGTH, gyro, &controllo_dati);
+	    if (gyro->is_valid == TRUE)
+	    {
+		print_sensore(gyro);
+	    }
+			printf("------------------------------------------------------------\n");
+			printf("------------------------------------------------------------\n");
+			printf("------------------------------------------------------------\n");
+			printf("------------------------------------------------------------\n");
+			printf("------------------------------------------------------------\n");
+
+	    //if (controllo_dati != 1) {printf("ERR_MAGNETO\n");}
+	    break;
+
+	case PACKET_ODOM_HEADER:
+	    steps_done[0] = 0;
+	    steps_done[1] = 0;
+		for (ii=0;ii<PACKET_ODOM_LENGTH; ii++)
+			printf("%2x\t",*((pic_message_buffer[0]) + c_aux+ii));
+		printf("\n");
+	    c_aux += get_odometria((pic_message_buffer[0]) + c_aux, PACKET_ODOM_LENGTH, &(steps_done[0]), &(steps_done[1]), &(sign_motors[0]), &(sign_motors[1]), &controllo_dati);
+
+	    //if (controllo_dati != 1) {
+	    //    //printf("ERR_ODOM\n");
+	    //    break;
+	    //}
+     printf("%d\t%d\t%d\t%d\n",steps_done[0],steps_done[1],sign_motors[0],sign_motors[1]);
+
+	    if (controllo_dati == 1)
+	    {
+		if (steps_done[0] >= delta_passi[0])
+		{
+		    delta_passi[0] = steps_done[0] - delta_passi[0];
+		}
+		else
+		{
+		    delta_passi[0] = MAX_STEPS_COUNTER - delta_passi[0] + steps_done[0];
+		}
+
+		if (steps_done[1] >= delta_passi[1])
+		{
+		    delta_passi[1] = steps_done[1] - delta_passi[1];
+		}
+		else
+		{
+		    delta_passi[1] = MAX_STEPS_COUNTER - delta_passi[1] + steps_done[1];
+		}
+
+
+		if (delta_passi[0] > THRESHOLD_STEPS_COUNTER || delta_passi[1] > THRESHOLD_STEPS_COUNTER)
+		{
+
+		    steps_done[0]=0;
+		    steps_done[1]=0;
+		    delta_passi[0]=0;
+		    delta_passi[1]=0;
+		    steps_anomaly = 1;
+#ifdef VERBOSE
+
+		    printf("ANOMALIA\n");
+#endif
+		}
+		else
+		{
+		    //delta_passi[0]=steps_done[0]-delta_passi[0];
+		    //delta_passi[1]=steps_done[1]-delta_passi[1];
+		    //printf("P1: %d %d\n", delta_passi[0],delta_passi[1]);
+		    //printf("SEGNI: %d %d\n", sign_motors[0],sign_motors[1]);
+		    delta_passi[0] *= sign_motors[0];
+		    delta_passi[1] *= sign_motors[1];
+
+		    pthread_mutex_lock(&mutex_state);
+		    get_state(&(delta_passi[0]), &(delta_passi[1]), state[STATE_THETA], &(delta_state[0]));
+
+		    state[STATE_X] += delta_state[STATE_X];
+		    state[STATE_Y] += delta_state[STATE_Y];
+		    state[STATE_THETA] += delta_state[STATE_THETA];
+		    if (state[STATE_THETA] > M_PI)
+		    {
+			state[STATE_THETA] -= (2 * M_PI);
+		    }
+		    if (state[STATE_THETA]<-M_PI)
+		    {
+			state[STATE_THETA] += (2 * M_PI);
+		    }
+
+		    pthread_mutex_unlock(&mutex_state);
+#ifdef VERBOSE
+		    //printf("STATO: %f %f %f\n", state[STATE_X], state[STATE_Y], state[STATE_THETA]);
+#endif
+		    //printf("A: %d %d\n", steps_done[0],steps_done[1]);
+#ifdef LOG_SU_FILE
+
+		    pthread_mutex_lock(&mutex_fp);
+		    if (controllo_dati == TRUE)
+		    {
+			print_odometria(fp_log, &state[0], &(steps_done[0]));
+		    }
+		    else
+		    {
+			fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
+		    }
+		    pthread_mutex_unlock(&mutex_fp);
+
+#else
+		    printf("%f %f %f\n", state[STATE_X], state[STATE_Y], state[STATE_THETA]);
+		    //printf("P: %d %d\n", delta_passi[0], delta_passi[1]);
+		    //printf("A: %d %d\n", steps_done[0], steps_done[1]);
+		    //printf("D: %f %f %f\n", delta_state[STATE_X],delta_state[STATE_Y],delta_state[STATE_THETA]);
+#endif
+		    //printf("%f %f %f\n", state[STATE_X], state[STATE_Y], state[STATE_THETA]);
+		    delta_passi[0] = steps_done[0];
+		    delta_passi[1] = steps_done[1];
+		}
+
+
+	    }
+	    else
+	    {
+#ifdef VERBOSE
+		printf("NOLOG\n");
+#endif
+		fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
+	    }
+	    break;
+	case PACKET_ERRPIC_HEADER:
+	    steps_done[0]=0;
+	    steps_done[1]=0;
+	    ++num_packet_sent_wrong;
+	    c_aux += PACKET_ERRPIC_LENGTH;
+	    //printf("e\n");
+	    break;
+	default:
+#ifdef VERBOSE
+	    printf("NC: c_aux %d    buffer_size %d code: %02x\n", c_aux, buffer_size, code);
+
+#endif
+	    //stampa_pacchetto(*pic_message_buffer, buffer_size);
+	    //printf("ERR: %02x n %d\n", code, c_aux);
+	    ++num_packet_data_wrong;
+	    controllo_dati = 0;
+	    pthread_mutex_lock(&mutex_fp);
+	    //fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);
+	    //fprintf(fp_log, "\nN%d\n", ++num_packet_data_ok);
+	    pthread_mutex_unlock(&mutex_fp);
+	    return ERROR_PACKET_ANALYZED;
+
+	}
+	//stampa_pacchetto(barile, buffer_size);
+
+
     }
-	
+
     //printf("RIMASTO: %d\n", buffer_size-c_aux);
     if (controllo_dati == 1 && buffer_size>0)
     {
-		pthread_mutex_lock(&mutex_fp);
-<<<<<<< HEAD
-		if (fp_log!=NULL) {fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);}
-=======
-		fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
-		//if (buffer_size<8)
-		//{
-		//    stampa_pacchetto((*pic_message_buffer), buffer_size);
-		//}
-		pthread_mutex_unlock(&mutex_fp);
-		clock_counter++;
-		return LOAD_PACKET_ANALYZED;
+	pthread_mutex_lock(&mutex_fp);
+	fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);
+	//if (buffer_size<8)
+	//{
+	//    stampa_pacchetto((*pic_message_buffer), buffer_size);
+	//}
+	pthread_mutex_unlock(&mutex_fp);
+	clock_counter++;
+	return LOAD_PACKET_ANALYZED;
     }
     else
     {
-		pthread_mutex_lock(&mutex_fp);
-<<<<<<< HEAD
-		if (fp_log!=NULL){fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);}
-=======
-		fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);
->>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
+	pthread_mutex_lock(&mutex_fp);
+	fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);
 		printf("-----------------------------------------------------------------\n");
-		pthread_mutex_unlock(&mutex_fp);
-		clock_counter++;
-		//wait_flag = 0;
-		//printf("e\n");
-		//stampa_pacchetto(*pic_message_buffer, buffer_size);
-		return ERROR_PACKET_ANALYZED;
-		
+	pthread_mutex_unlock(&mutex_fp);
+	clock_counter++;
+	//wait_flag = 0;
+	//printf("e\n");
+	//stampa_pacchetto(*pic_message_buffer, buffer_size);
+	return ERROR_PACKET_ANALYZED;
+
     }
     return 1;
-
+	
 	
 
 }

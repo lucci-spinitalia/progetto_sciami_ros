@@ -56,6 +56,11 @@ void termination_handler(int signum)
     // Clean the buffer	
     tcflush(pic_fd, TCIFLUSH);
     tcflush(pic_fd, TCOFLUSH);	
+<<<<<<< HEAD
+=======
+    //printf("lastvel2send = %i\n", pic_last_vel_2_send);
+    //printf("lastvel2write = %i\n", pic_last_vel_2_write);
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 
     set_vel_2_array(pic_buffer[pic_last_vel_2_send], 0, 0);
     write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SPEED_LENGTH + 1);
@@ -76,15 +81,32 @@ int main(int argc, char** argv)
     Saetta_Base* localbase = new Saetta_Base();
     // Declare variables that can be modified by launch file or command line.
     int rate = 20;
+<<<<<<< HEAD
     // set velocity subscriber
+=======
+    // Initialize node parameters from launch file or command line.
+    // Use a private node handle so that multiple instances of the node can be run simultaneously
+    // while using different parameters.
+    //ros::NodeHandle base_handle_("~"); //verificare se è davvero essenziale (non credo)
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
     ros::Subscriber sub = n.subscribe("/saetta/velocity", 10, &Saetta_Base::listenerCallback, localbase);
 
     // Tell ROS how fast to run this node.
     ros::Rate r(rate);
     std::string nPort; //default port name
     n.param<std::string>("port", nPort, "/dev/ttyO3");
+<<<<<<< HEAD
     ROS_INFO_STREAM("ROS parameter 'port' setted as: " << nPort);
     float starting_speed = 0.0;
+=======
+    ROS_INFO_STREAM("Port: " << nPort);
+    float starting_speed = 0.0;
+    //secondo libreria il log va aperto per forza. 
+    //O si leva dalla lib o si trova un path adeguato
+    //char file_log[100]="/home/panda/.ros/saetta_base/acc.txt";
+    char file_log[100]="acc.txt";  
+    fp_log = fopen(file_log, "w");
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
     
     // convert string to char*
     char* nPort_char = new char[nPort.size() + 1];
@@ -128,6 +150,10 @@ int main(int argc, char** argv)
     write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
     tcflush(pic_fd, TCOFLUSH);
     sync();
+<<<<<<< HEAD
+=======
+    //steps_anomaly = 0; 
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 
     setup_termination();  //???
     // Create PIC thread
@@ -139,6 +165,10 @@ int main(int argc, char** argv)
     pthread_cond_wait(&cond, &tmutex);
     pthread_mutex_unlock(&tmutex);
     setup_termination(); //???
+<<<<<<< HEAD
+=======
+
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
     while (n.ok())
     {
         ros::spinOnce();
@@ -160,6 +190,10 @@ void* tf_pic2netus(void *args)
 {
     unsigned char buf[256];
     int byte_read;
+<<<<<<< HEAD
+=======
+    int tot_byte_read;
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
     int an_ret;
     tcflush(pic_fd, TCIFLUSH);
     tcflush(pic_fd, TCOFLUSH);
@@ -168,7 +202,10 @@ void* tf_pic2netus(void *args)
     do 
     {	
         rr=read(pic_fd, buf, 1);
+<<<<<<< HEAD
         
+=======
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
     }   while(buf[0]!=0x0A);
     
     while(1) 
@@ -191,6 +228,10 @@ void* tf_pic2netus(void *args)
             
         }   while(*(buf+byte_read-1)!='\n');
         
+<<<<<<< HEAD
+=======
+        tot_byte_read = byte_read;
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
         analizza_pacchetto(buf,byte_read);
         byte_read = 0;
         // Get the whole pkg
@@ -205,16 +246,23 @@ void* tf_pic2netus(void *args)
         an_ret = analizza_pacchetto(buf,byte_read);
         if (an_ret == LOAD_PACKET_ANALYZED )
         {
+<<<<<<< HEAD
             pthread_cond_signal(&cond); //riparte il ciclo ROS
         }
     }
     return 0;
+=======
+            pthread_cond_signal(&cond); //riparte parte il ciclo ROS
+        }
+    }	
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 }
 
 
 
 int set_interface_attribs (int fd, int speed, int parity)
 {
+<<<<<<< HEAD
     struct termios tty;
     memset (&tty, 0, sizeof tty);
     if (tcgetattr (fd, &tty) != 0)
@@ -234,4 +282,25 @@ int set_interface_attribs (int fd, int speed, int parity)
         return -1;
     }
     return 0;
+=======
+        struct termios tty;
+        memset (&tty, 0, sizeof tty);
+        if (tcgetattr (fd, &tty) != 0)
+        {
+                printf ("error %d from tcgetattr", errno);
+                return -1;
+        }
+
+        cfsetospeed (&tty, speed);
+        cfsetispeed (&tty, speed);
+
+        tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
+        
+        if (tcsetattr (fd, TCSANOW, &tty) != 0)
+        {
+                printf ("error %d from tcsetattr", errno);
+                return -1;
+        }
+        return 0;
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 }

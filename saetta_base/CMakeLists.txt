@@ -28,7 +28,11 @@ include_directories (include)
 include_directories (${INCLUDE_PATHS})
 include_directories (${saetta_msgs_PACKAGE_PATH}/msg_gen/cpp/include)
 
+<<<<<<< HEAD
 #rosbuild_find_ros_package (tf)
+=======
+rosbuild_find_ros_package (tf)
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 
 Find_Package(SDL REQUIRED)
 if(NOT SDL_FOUND)
@@ -47,8 +51,12 @@ rosbuild_add_library(pic2netus src/core/pic2netus.c)
 rosbuild_add_boost_directories()
 rosbuild_add_executable(base src/mainbase.cpp)
 rosbuild_link_boost(base thread)
+<<<<<<< HEAD
 #target_link_libraries(base core pic2netus serial_comm robot_comm ausiliarie robot_sensors rt tf)
 target_link_libraries(base core pic2netus serial_comm robot_comm ausiliarie robot_sensors rt)
+=======
+target_link_libraries(base core pic2netus serial_comm robot_comm ausiliarie robot_sensors rt tf)
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 target_link_libraries(robot_sensors ausiliarie robotcore)
 target_link_libraries(robotcore ausiliarie m)
 target_link_libraries(robot_comm serial_comm)

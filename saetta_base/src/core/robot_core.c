@@ -7,6 +7,10 @@
 void init_robot() {
     //=====================================
     //			Init
+<<<<<<< HEAD
+=======
+    int i;
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
     clock_counter = 0;
     //Packet Type
     packet_type = ERROR_PACKET_ANALYZED;
@@ -379,7 +383,11 @@ float linear_speed_limited=*linear_speed;
     /************/
 
     /*From linear and angular speed to each engine velocity*/
+<<<<<<< HEAD
    //printf("saturated speed -> linear: %f  \t angular: %f\n", linear_speed_limited , angular_speed_limited);
+=======
+   printf("saturated speed -> linear: %f  \t angular: %f\n", linear_speed_limited , angular_speed_limited);
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 	get_vel_motori_constant_ratio(&linear_speed_limited,&angular_speed_limited, &v_m1, &v_m2);
     /*Getting the number of pulses*/
     calcola_velocita(v_m1, TRISTEPPING, &pulse_m1);

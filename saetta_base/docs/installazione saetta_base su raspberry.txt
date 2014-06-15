@@ -1,0 +1,49 @@
+-----NUOVO WORKSPACE 
+
+mkdir -p ~/catkin_ws
+cd ~/catkin_ws
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/src
+wstool init
+
+aggiungi al file ~/.bashrc     source ~/catkin_ws/devel/setup.sh
+(ci dovrebbe essere al suo interno anche il source ~/ros_catkin_ws/devel_isolated/setup.bash) ----------------------------> ~/ros_catkin_ws/install_isolated/setup.bash
+
+
+
+------INSTALLAZIONE LIBRERIE
+
+sudo apt-get install libeigen3-dev freeglut3-dev python-sip libsdl1.2-dev libncurses5-dev -------------------->python-sip-dev libpoco-dev
+
+
+
+------INSTALLAZIONE LIBRERIA BULLET (serve per il pacchetto tf)
+scarica da qui i sorgenti http://code.google.com/p/bullet/downloads/detail?name=bullet-2.82-r2704.tgz&can=2&q= ---------------------------------> https://bullet.googlecode.com/files/bullet-2.82-r2704.tgz
+
+
+tar zxvf bullet-2.82-r2704.tgz
+cd bullet-2.82-r2704.tgz  -------------------------> bullet-2.82-r2704  ---------------------> A CHE SERVE?
+cmake . -G "Unix Makefiles"
+make (ci vorrà un po' di tempo...)
+sudo make install
+
+
+-----PACKAGE ROS MANCANTI
+
+cd ~/catkin_ws/src
+git clone -b hydro-devel https://github.com/ros/geometry
+git clone -b hydro-devel https://github.com/ros/geometry_experimental
+git clone -b hydro-devel https://github.com/ros/actionlib
+git clone https://github.com/orocos/orocos_kinematics_dynamics         --------------------------------->SERVE?
+git clone https://github.com/ros/angles
+git clone -b hydro-devel https://github.com/ros/common_msgs.git
+git clone -b groovy-devel https://github.com/ros/pluginlib
+---------------------------------------------->git clone -b hydro-devel https://github.com/ros/class_loader.git
+
+cd ..
+catkin_make
+
+------PACKAGE SAETTA
+dal link dropbox prendi saetta_base e saetta_msgs e mettili in catkin_ws/src
+----------------------------------------------> set $PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/home/pi/catkin_ws/install_isolated/lib/pkgconfig
+fai rosmake saetta_base ----------------------> rosmake --pre-clean saetta_base

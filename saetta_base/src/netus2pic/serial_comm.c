@@ -86,5 +86,8 @@ int i;
 		free(pic_message_buffer[i]);
 	}
 	pthread_mutex_destroy(&m_analizza_pacchetto);
+<<<<<<< HEAD
         close(pic_fd);
+=======
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 }

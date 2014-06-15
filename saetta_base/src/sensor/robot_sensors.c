@@ -147,6 +147,7 @@ void 	print_sensore_on_file(sensore s, FILE* paux){
 
 	int i;
 	//	carattere tab
+<<<<<<< HEAD
         if (paux != NULL) {
             fprintf(paux, "%c", 0x09);	
             for(i=0;i<s->num_canali;i++){
@@ -154,6 +155,13 @@ void 	print_sensore_on_file(sensore s, FILE* paux){
                     fprintf(paux, "%4u ", *(s->range+i));
             }
         }
+=======
+	fprintf(paux, "%c", 0x09);	
+	for(i=0;i<s->num_canali;i++){
+		//printf("%4u ", ir_distance[1023-*(s->range+i)]);
+		fprintf(paux, "%4u ", *(s->range+i));
+	}
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 	//fprintf(paux, "\n", *(s->range+i));
 }
 //------------------------------------------------------------------------------
@@ -282,6 +290,7 @@ int	load_gyro_table(char *file_name){
 
 	int	num_campi;
 	int i;
+<<<<<<< HEAD
 	fp_gyro=fopen(GYRO_FILE, "r");
         if (fp_gyro != NULL) {
             fscanf(fp_gyro, "%d", &gyro_table_min_index);
@@ -293,6 +302,15 @@ int	load_gyro_table(char *file_name){
         } else {
             printf("Error opening gyro: gyro_table.txt");
         }
+=======
+	fp_gyro=fopen(GYRO_FILE, "r+");
+	fscanf(fp_gyro, "%d", &gyro_table_min_index);
+	fscanf(fp_gyro, "%d", &gyro_table_max_index);
+	fscanf(fp_gyro, "%d", &gyro_table_nominal_zero);
+	num_campi	=	gyro_table_max_index-gyro_table_min_index;
+	gyro_table_value=malloc(num_campi*sizeof(float));
+	for(i=1;i<num_campi;i++){fscanf(fp_gyro, "%f\n",  (gyro_table_value+i));}
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 
 }
 //=========================================================================================================
@@ -303,10 +321,16 @@ void create_magneto_table(){
 
 	int x,y,maxx,maxy,minx,miny;
 	float offsetx,offsety,fattnormx,fattnormy,i,j,rad;
+<<<<<<< HEAD
+=======
+	fpm_table	=	fopen(MAGNETO_TABLE, "w");
+	fpm_log		=	fopen(MAGNETO_LOG,"r");
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 	maxx 		= 	0;
 	maxy 		= 	0;
 	minx 		= 	2000;
 	miny 		= 	2000;
+<<<<<<< HEAD
         
         fpm_log = fopen(MAGNETO_LOG,"r");
         if (fpm_log == NULL) {
@@ -344,6 +368,32 @@ void create_magneto_table(){
             fclose(fpm_log);
         }
         
+=======
+	while(fscanf(fpm_log,"%d %d\n",&x,&y)!=EOF){
+		if (x>-1 && y>-1) {
+			if (x>maxx){maxx = x;}
+			if (x<minx){minx = x;}
+			if (y>maxy){maxy = y;}
+			if (y<miny){miny = y;}
+		}
+	}
+	offsetx		=	(maxx+minx)/2.0;
+	offsety		=	(maxy+miny)/2.0;
+	fattnormx	=	maxx-offsetx;
+	fattnormy	=	maxy-offsety;
+
+	//printf("OFFSETS: %f %f\n", offsetx, offsety);
+	//printf("FATTNORM: %f %f\n", fattnormx, fattnormy);
+	fprintf(fpm_table,"%d %d %d %d\n",minx,maxx,miny,maxy);
+	for(i=-fattnormx;i<=fattnormx;i++) {
+		for(j=-fattnormy;j<=fattnormy;j++) {
+			rad = atan2(j/fattnormy,i/fattnormx);
+			fprintf(fpm_table,"%d %d %f\n",(int)(i+offsetx),(int)(j+offsety),rad);
+		}
+	}
+	fclose(fpm_log);
+	fclose(fpm_table);
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
 }
 //=========================================================================================================
 
@@ -352,6 +402,7 @@ void create_magneto_table(){
 
 //=========================================================================================================
 int magneto_table_2_struct(structMag **im) {
+<<<<<<< HEAD
     
     fpm_table =	fopen(MAGNETO_TABLE, "r");
     if (fpm_table != NULL) {
@@ -395,6 +446,47 @@ int magneto_table_2_struct(structMag **im) {
         printf("Error opening magneto_table.txt\n");
     }
 
+=======
+
+    *im = (structMag *)malloc( sizeof( structMag ) );
+	if ( *im == NULL)
+	{
+		printf("creaTabellaMagneto: Non è possibile creare strucMag (out of memory?)...\n");
+		return -1;
+	}
+    int a,posizione,minx,miny,maxx,maxy;
+    float rad;
+	fpm_table	=	fopen(MAGNETO_TABLE, "r");
+    fscanf(fpm_table,"%d %d %d %d",&minx,&maxx,&miny,&maxy);
+
+    (*im)->righeTabMag  	=	maxx-minx+1;
+    (*im)->colonneTabMag 	=	maxy-miny+1;
+    (*im)->tozerox 			=	minx;
+    (*im)->tozeroy 			=	miny;
+    (*im)->tabMag 			=	(float*)malloc(sizeof(float)* (*im)->righeTabMag * (*im)->colonneTabMag);
+	//printf("OFFSET  RILEVATI: %d %d\n",(*im)->tozerox,(*im)->tozeroy);
+    if ( (*im)->tabMag == NULL)
+	{
+		printf("creaTabellaMagneto: Non è possibile creare il campo tabMag (out of memory?)...\n");
+		return -1;
+	}
+
+    //printf("%d %d %d\n",(*im)->righeTabMag,(*im)->colonneTabMag,(*im)->righeTabMag*(*im)->colonneTabMag);
+
+    posizione=0;
+    while(fscanf(fpm_table,"%d %d %f\n",&a,&a,&rad)!=EOF) {
+	(*im)->tabMag[posizione]=rad;
+	posizione++;
+    }
+
+
+    fclose(fpm_table);
+
+    //imposto la posizione iniziale a -100 (posizione iniziale non ancora salvata)
+    //(*im)->nordRad = -100;
+
+
+>>>>>>> fdf1fb0d09c03c40bc715d7bf1694521c49c606f
     return 0;
 }
 //=========================================================================================================
