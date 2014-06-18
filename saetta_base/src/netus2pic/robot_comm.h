@@ -124,7 +124,7 @@ static unsigned char			pic_message_reset_steps_acc[4]={131,0x7D, 0xFF, 0x0A};	//
 Funzione di inizializzazione dei vari moduli di comunicazione (pic e radio)
 @brief Inizializzazione  della porta seriale-pic e dei buffer di comunicazione
 */
-void 	init_modulo_comm();				//	comm module initialization
+void 	init_modulo_comm(char* portname);				//	comm module initialization
 
 //		operazioni sul pacchetto vel
 

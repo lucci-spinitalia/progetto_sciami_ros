@@ -613,7 +613,7 @@ int analizza_pacchetto_init()
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
-				else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}}
 				//ir->is_valid=FALSE;
 				pthread_mutex_unlock(&mutex_fp);
 #else
@@ -633,7 +633,7 @@ int analizza_pacchetto_init()
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
-				else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}}
 				//ir->is_valid=FALSE;
 				pthread_mutex_unlock(&mutex_fp);
 #else
@@ -653,7 +653,7 @@ int analizza_pacchetto_init()
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);print_sensore(acc);}
-				else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}}
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				if (acc->is_valid == TRUE){print_sensore(acc);}
@@ -680,7 +680,7 @@ int analizza_pacchetto_init()
 				pthread_mutex_lock(&mutex_fp);
 				if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);}//print_sensore(acc);
 				if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}//print_sensore(magneto);
-				else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}}
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				if (acc->is_valid == TRUE){print_sensore(acc);}
@@ -702,7 +702,7 @@ int analizza_pacchetto_init()
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}
-				else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}}
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				//if (magneto->is_valid == TRUE){print_sensore(magneto);}
@@ -720,7 +720,7 @@ int analizza_pacchetto_init()
 				if(controllo_dati==1){
 					
 					if(abs(gyro_integral_pic)>16){gyro_sup_integral+=((float)gyro_integral_pic)/1024;}
-					fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);
+					if (fp_log!=NULL){fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);}
 				}
 				else{printf("INTEGRALE SBAGLIATO\n");}
 				//			printf("ANGLE: %f\n", gyro_sup_integral);
@@ -754,7 +754,7 @@ int analizza_pacchetto_init()
 				pthread_mutex_lock(&mutex_fp);
 				
 				if (gyro->is_valid == TRUE){print_sensore_on_file(gyro, fp_log);}
-				else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}}
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				//if (gyro->is_valid == TRUE){print_sensore(gyro);}
@@ -890,7 +890,7 @@ int analizza_pacchetto_init()
 						}
 						else
 						{
-							fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
+							if (fp_log!=NULL){fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);}
 						}
 						pthread_mutex_unlock(&mutex_fp);
 						
@@ -912,7 +912,7 @@ int analizza_pacchetto_init()
 #ifdef VERBOSE
 					printf("NOLOG\n");
 #endif
-					fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
+					if (fp_log!=NULL){fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);}
 				}
 				break;
 			case PACKET_ERRPIC_HEADER:
@@ -950,7 +950,7 @@ int analizza_pacchetto_init()
     if (controllo_dati == 1 && buffer_size>0)
     {
 		pthread_mutex_lock(&mutex_fp);
-		fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);
+		if (fp_log!=NULL){fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);}
 		//if (buffer_size<8)
 		//{
 		//    stampa_pacchetto((*pic_message_buffer), buffer_size);
@@ -962,7 +962,7 @@ int analizza_pacchetto_init()
     else
     {
 		pthread_mutex_lock(&mutex_fp);
-		fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);
+		if (fp_log!=NULL){fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);}
 		printf("-----------------------------------------------------------------\n");
 		pthread_mutex_unlock(&mutex_fp);
 		clock_counter++;
@@ -1079,7 +1079,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
-				else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}}
 				//ir->is_valid=FALSE;
 				pthread_mutex_unlock(&mutex_fp);
 #else
@@ -1101,7 +1101,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (ir->is_valid == TRUE){print_sensore_on_file(ir, fp_log);}//print_sensore(ir);
-				else{fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d %d %d ", 0x09, -1, -1, -1, -1, -1);}}
 				//ir->is_valid=FALSE;
 				pthread_mutex_unlock(&mutex_fp);
 #else
@@ -1123,7 +1123,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);print_sensore(acc);}
-				else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}}
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				if (acc->is_valid == TRUE){print_sensore(acc);}
@@ -1152,7 +1152,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 				pthread_mutex_lock(&mutex_fp);
 				if (acc->is_valid == TRUE){print_sensore_on_file(acc, fp_log);}//print_sensore(acc);
 				if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}//print_sensore(magneto);
-				else{fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d %d ", 0x09, -1, -1, -1);}}
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				if (acc->is_valid == TRUE){print_sensore(acc);}
@@ -1176,7 +1176,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 #ifdef LOG_SU_FILE
 				pthread_mutex_lock(&mutex_fp);
 				if (magneto->is_valid == TRUE){print_sensore_on_file(magneto, fp_log);}
-				else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}}
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				//if (magneto->is_valid == TRUE){print_sensore(magneto);}
@@ -1196,7 +1196,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 				if(controllo_dati==1){
 					
 					if(abs(gyro_integral_pic)>16){gyro_sup_integral+=((float)gyro_integral_pic)/1024;}
-					fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);
+					if (fp_log!=NULL){fprintf(fp_log, "%c %d %f",0x09, gyro_integral_pic,gyro_sup_integral);}
 				}
 				else{printf("INTEGRALE SBAGLIATO\n");}
 				//			printf("ANGLE: %f\n", gyro_sup_integral);
@@ -1232,7 +1232,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 				pthread_mutex_lock(&mutex_fp);
 				
 				if (gyro->is_valid == TRUE){print_sensore_on_file(gyro, fp_log);}
-				else{fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}
+				else{if (fp_log!=NULL){fprintf(fp_log, "%c %d %d ", 0x09, -1, -1);}}
 				pthread_mutex_unlock(&mutex_fp);
 #else
 				//if (gyro->is_valid == TRUE){print_sensore(gyro);}
@@ -1365,14 +1365,16 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 #ifdef LOG_SU_FILE
 						
 						pthread_mutex_lock(&mutex_fp);
-						if (controllo_dati == TRUE)
-						{
-							print_odometria(fp_log, &state[0], &(steps_done[0]));
-						}
-						else
-						{
-							fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
-						}
+                                                if (fp_log != NULL) {
+                                                    if (controllo_dati == TRUE)
+                                                    {
+                                                            print_odometria(fp_log, &state[0], &(steps_done[0]));
+                                                    }
+                                                    else
+                                                    {
+                                                            fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
+                                                    }
+                                                }
 						pthread_mutex_unlock(&mutex_fp);
 						
 #else
@@ -1394,8 +1396,8 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 				{
 #ifdef VERBOSE
 					printf("NOLOG\n");
-#endif
-					fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);
+#endif                                  if (fp_log!=NULL){ fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);}
+                                        
 				}
 				break;
 			case PACKET_ERRPIC_HEADER:
@@ -1433,7 +1435,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
     if (controllo_dati == 1 && buffer_size>0)
     {
 		pthread_mutex_lock(&mutex_fp);
-		fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);
+		if (fp_log!=NULL) {fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);}
 		//if (buffer_size<8)
 		//{
 		//    stampa_pacchetto((*pic_message_buffer), buffer_size);
@@ -1445,7 +1447,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
     else
     {
 		pthread_mutex_lock(&mutex_fp);
-		fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);
+		if (fp_log!=NULL){fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);}
 		printf("-----------------------------------------------------------------\n");
 		pthread_mutex_unlock(&mutex_fp);
 		clock_counter++;

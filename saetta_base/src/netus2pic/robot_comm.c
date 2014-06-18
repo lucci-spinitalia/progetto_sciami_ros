@@ -6,7 +6,7 @@
 //______________________________________________________________________________
 
 //------------------------------------------------------------------------------
-void 	init_modulo_comm(){
+void 	init_modulo_comm(char* portname){
 	
 	
 	int i;
@@ -20,7 +20,7 @@ void 	init_modulo_comm(){
 	num_packet_data_ok=0;
 	num_packet_data_wrong=0;
 	num_packet_sent_wrong=0;
-	init_serial_comm();
+	init_serial_comm(portname);
 	#ifdef USA_XBEE
 		inizializza_xbee();	
 	#endif

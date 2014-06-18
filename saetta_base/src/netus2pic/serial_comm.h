@@ -28,7 +28,7 @@ pthread_mutex_t m_io;
 #define 		FALSE 				0
 #define 		TRUE 				1
 ///\brief		porta seriale del PIC
-#define 		PIC_DEVICE			"/dev/ttyO3"	//	pic physical port
+//#define 		PIC_DEVICE			"/dev/ttyO3"	//	pic physical port
 ///\brief		velocità della porta seriale del PIC
 #define 		BAUDRATE 			B115200			//	port baudrate
 

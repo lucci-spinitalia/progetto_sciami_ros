@@ -7,7 +7,6 @@
 void init_robot() {
     //=====================================
     //			Init
-    int i;
     clock_counter = 0;
     //Packet Type
     packet_type = ERROR_PACKET_ANALYZED;
@@ -20,7 +19,7 @@ void init_robot() {
     pthread_mutex_init(&mutex_acc, NULL);
     pthread_mutex_init(&mutex_magneto, NULL);
     init_sensors();
-    init_modulo_comm();
+    //init_modulo_comm();
 }
 
 //------------------------------------------------------------------------------
@@ -363,14 +362,14 @@ void set_robot_speed(float *linear_speed, float *angular_speed) {
 float linear_speed_limited=*linear_speed;
  float angular_speed_limited=*angular_speed;
 
-printf("last_ref: v:[%f], w:[%f]\n", last_v_ref, last_w_ref);
+//printf("last_ref: v:[%f], w:[%f]\n", last_v_ref, last_w_ref);
     /*Backward differentiation*/
 
     float back_diff_v_ref = (*linear_speed - last_v_ref) / Hz_4;
     float back_diff_w_ref = (*angular_speed - last_w_ref) / Hz_4;
 
     /**************************/
-printf("speed BEFORE SATURATION - linear: %f  \t angular: %f\n",*linear_speed, *angular_speed);
+//printf("speed BEFORE SATURATION - linear: %f  \t angular: %f\n",*linear_speed, *angular_speed);
     /*Saturation*/
     if (fabs(back_diff_v_ref) > max_lin_acc && fabs(*linear_speed)>fabs(last_v_ref))
         linear_speed_limited = last_v_ref + (max_lin_acc * Hz_4)*(*linear_speed / fabs(*linear_speed));
@@ -380,12 +379,12 @@ printf("speed BEFORE SATURATION - linear: %f  \t angular: %f\n",*linear_speed, *
     /************/
 
     /*From linear and angular speed to each engine velocity*/
-   printf("speed AFTER SATURATION - linear: %f  \t angular: %f\n", linear_speed_limited , angular_speed_limited);
+   //printf("saturated speed -> linear: %f  \t angular: %f\n", linear_speed_limited , angular_speed_limited);
 	get_vel_motori_constant_ratio(&linear_speed_limited,&angular_speed_limited, &v_m1, &v_m2);
     /*Getting the number of pulses*/
     calcola_velocita(v_m1, TRISTEPPING, &pulse_m1);
     calcola_velocita(v_m2, TRISTEPPING, &pulse_m2);
-	printf("vm1: %f ---- vm2: %f\n",v_m1, v_m2);
+	//printf("vm1: %f ---- vm2: %f\n",v_m1, v_m2);
 
     /*Pulses Saturation*/
     if(pulse_m1 != 0)

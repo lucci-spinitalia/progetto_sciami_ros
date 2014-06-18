@@ -20,11 +20,13 @@ extern "C" {
 
 //relativo a creaTabellaMagneto
 ///\brief file risultato della fase di calibrazione magnetometro (tabella)
-#define OUTPUT         "/home/panda/.ros/saetta_base/output.txt"
+//#define OUTPUT         "/home/panda/.ros/saetta_base/output.txt"
+//#define OUTPUT         "output.txt"
 
 //relativo a creaTabellaMagneto
 ///\brief file risultato della fase di calibrazione magnetometro (max min)
-#define DATIMAG        "/home/panda/.ros/saetta_base/datimag.txt"
+//#define DATIMAG        "/home/panda/.ros/saetta_base/datimag.txt"
+//#define DATIMAG        "datimag.txt"
 
 float 		distanza, velocita;
 int   		angle_degrees;
@@ -45,11 +47,17 @@ FILE* fpm_log;
 FILE* fpm_table;
 
 ///\brief filename of the magneto self-rotation
-#define MAGNETO_LOG "/home/panda/.ros/saetta_base/magneto_rot.txt"
+//#define MAGNETO_LOG "/home/panda/.ros/saetta_base/magneto_rot.txt"
+#define MAGNETO_LOG "log_files/magneto_rot.txt"
+
 ///\brief filename of the magneto self-rotation
-#define MAGNETO_TABLE "/home/panda/.ros/saetta_base/magneto_table.txt"
+//#define MAGNETO_TABLE "/home/panda/.ros/saetta_base/magneto_table.txt"
+#define MAGNETO_TABLE "tables/magneto_table.txt"
+
 ///\brief filename of the gyro lookup table
-#define GYRO_FILE "/home/panda/.ros/saetta_base/gyro_table.txt"
+//#define GYRO_FILE "/home/panda/.ros/saetta_base/gyro_table.txt"
+#define GYRO_FILE "tables/gyro_table.txt"
+
 ///\brief file pointer of the gyro lookup table
 FILE *fp_gyro;
 ///\brief pointer to the gyro lookup table values
