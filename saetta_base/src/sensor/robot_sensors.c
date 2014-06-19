@@ -34,7 +34,7 @@ void init_sensore(sensore* s, int numero_sensori){
 
 //=========================================================================================================
 
-inline void gyro_zero_setting() {
+inline void gyro_zero_setting(unsigned char *pic_buffer) {
 
     int local_counter = 0;
     int local_value = 0;
@@ -44,7 +44,7 @@ inline void gyro_zero_setting() {
 	    pthread_cond_wait(&cv_analizza_pacchetto, &m_analizza_pacchetto);
 	}
 	pthread_mutex_unlock(&m_analizza_pacchetto);
-	packet_type = analizza_pacchetto_init();
+	packet_type = analizza_pacchetto_init(pic_buffer);
 	if (gyro->is_valid == TRUE) {
 	    if (local_value == *(gyro->range + 1)) {
 		local_counter++;
@@ -66,7 +66,7 @@ inline void gyro_zero_setting() {
 
 //=========================================================================================================
 
-inline void calibrazione_magneto() {
+inline void calibrazione_magneto(unsigned char *pic_buffer) {
 
     int magneto_flag = 0;
     int v1,v2;
@@ -77,7 +77,7 @@ inline void calibrazione_magneto() {
     calcola_angolo(angle_rad, velocita, &v1, &v2, &num_passi);
     v1 = v1 / modulo(v1)*(1024 - modulo(v1));
     v2 = v2 / modulo(v2)*(1024 - modulo(v2));
-    set_pos_2_array(pic_buffer[pic_last_vel_2_send], v1, v2, num_passi, num_passi);
+    set_pos_2_array(pic_buffer[0], v1, v2, num_passi, num_passi);
 
     while (flag_servoing_completed != 1) {
 	pthread_mutex_lock(&m_analizza_pacchetto);
@@ -85,7 +85,7 @@ inline void calibrazione_magneto() {
 	    pthread_cond_wait(&cv_analizza_pacchetto, &m_analizza_pacchetto);
 	}
 	pthread_mutex_unlock(&m_analizza_pacchetto);
-	packet_type = analizza_pacchetto_init();
+	packet_type = analizza_pacchetto_init(pic_buffer);
 	if (magneto->is_valid == TRUE) {
 	    print_sensore_on_file(magneto, fpm_log);
 	    fprintf(fpm_log, "\n");
@@ -98,7 +98,7 @@ inline void calibrazione_magneto() {
 
 //=========================================================================================================
 
-inline void magneto_zero_setting() {
+inline void magneto_zero_setting(unsigned char *pic_buffer) {
 
     int local_counter = 0;
     int local_value = 0;
@@ -110,7 +110,7 @@ inline void magneto_zero_setting() {
 	    pthread_cond_wait(&cv_analizza_pacchetto, &m_analizza_pacchetto);
 	}
 	pthread_mutex_unlock(&m_analizza_pacchetto);
-	packet_type = analizza_pacchetto_init();
+	packet_type = analizza_pacchetto_init(pic_buffer);
 	if (magneto->is_valid == TRUE) {
 	    x += *(magneto->range);
 	    y += *(magneto->range + 1);

@@ -60,12 +60,7 @@ int get_sensore(unsigned char* payload, int l, sensore s, int *verifica)
     }
     //printf("CONTATORE FINALE: %02x\n", contatore);
     s->is_valid = (contatore == 0);
-    //printf("Integrita': %d\n", s->is_valid);
-    ///printf("------------\n");
-    //-------------------------------------
-	
-    //if(contatore!=0){printf("**");stampa_pacchetto(payload, l);printf("\n");}
-    //-------------------------------------
+
     *verifica &= (contatore == 0);
 	
     return j;
@@ -81,7 +76,7 @@ int 	get_gyro_integral(unsigned char* payload, int l, short *integral, int *veri
     contatore += *payload;
     int i, j,z;
     j = 1;
-	//stampa_pacchetto(payload, l+1);
+
 	*integral=0;
     for (i = 1; i < l - 2; i++)
     {
@@ -202,12 +197,7 @@ int get_magacc(unsigned char* payload, int l, sensore s, int *verifica)
     //printf("CONTATORE FINALE: %02x\n", contatore);
     magneto->is_valid = (contatore == 0);
 	acc->is_valid = (contatore == 0);
-    //printf("Integrita': %d\n", s->is_valid);
-    ///printf("------------\n");
-    //-------------------------------------
-	
-    //if(contatore!=0){printf("**");stampa_pacchetto(payload, l);printf("\n");}
-    //-------------------------------------
+
     *verifica &= (contatore == 0);
 	
     return j;
@@ -221,7 +211,7 @@ int get_distanza(unsigned char* payload, int l, sensore s, int *verifica)
     contatore += *payload;
     int i, j;
     j = 1;
-	//stampa_pacchetto(payload, l);
+
     for (i = 0; i < s->num_canali; i++)
     {
 		s->range[i] = 0;
@@ -259,15 +249,6 @@ int get_distanza(unsigned char* payload, int l, sensore s, int *verifica)
     }
     //printf("CONTATORE FINALE: %02x\n", contatore);
     s->is_valid = (contatore == 0);
-	
-	//if(contatore==0){printf("OK!: %d %d %d %d %d\n",  *(s->range), *(s->range+1),*(s->range+2),*(s->range+3),*(s->range+4));stampa_pacchetto(payload, j);}
-	//else{printf("ERRORE: ");stampa_pacchetto(payload, j);}
-    //printf("Integrita': %d\n", s->is_valid);
-    ///printf("------------\n");
-    //-------------------------------------
-	
-    //if(contatore!=0){printf("**");stampa_pacchetto(payload, l);printf("\n");}
-    //-------------------------------------
     *verifica &= (contatore == 0);
 	
     return j;
@@ -340,8 +321,7 @@ int get_odometria(unsigned char* payload, int l, int *p_m1, int *p_m2, int *s1, 
     contatore = ~contatore;
 	
     contatore++;
-	
-    //printf("CONTATORE2: %02x\n", contatore);
+
     for (i = 0; i < 1; i++)
     {
 		if (*(payload + j) == PACKET_SOGLIA)
@@ -349,18 +329,19 @@ int get_odometria(unsigned char* payload, int l, int *p_m1, int *p_m2, int *s1, 
 			j++;
 			*(payload + j) -= (PACKET_SOGLIA + PACKET_OFFSET_MASCHERAMENTO);
 		}
-		//printf("CONTATORE: %d\n", contatore);
-		//contatore -= (*(payload + j) * moltiplicatore[i]);
-		//printf("Contatore: %d | %d CRC: %d status: %d\n", contatore,contatore&255,*(payload + j), *verifica );
+
 		contatore&=255;
 		contatore =   contatore-(int)(*(payload + j));
 		j++;
     }
-	//printf("Contatore: %d\n", contatore); 
+
     *verifica = (contatore == 0);
-	//printf("Contatore: %d CRC: %d status: %d\n", contatore,*(payload + j), *verifica );
-    if(*verifica!=1){printf("FUCK ---------------------------\n");stampa_pacchetto(payload, j);}
-	//stampa_pacchetto(payload, j);
+
+    if(*verifica!=1)
+    {
+      printf("FUCK ---------------------------\n");
+    }
+
     return j;
 	
 	
@@ -497,41 +478,29 @@ int genera_pacchetto_sensore_standard(unsigned char *pacchetto, struct sensore_t
 
 
 //------------------------------------------------------------------------------
-int analizza_pacchetto_init()
+int analizza_pacchetto_init(unsigned char* buffer)
 {
-	
-	
-    int buffer_size;
-    int c_aux = 0;
-    int controllo_dati = 1;
-    unsigned int code;
-    unsigned int i;
+  int buffer_size;
+  int c_aux = 0;
+  int controllo_dati = 1;
+  unsigned int code;
+  unsigned int i;
 	
 	printf("-----analizza pacchetto----\n");	
-	//buffer_size = read(pic_fd, *pic_message_buffer, MAX_PIC_MES_LENGHT);
+
 	buffer_size=0;
-	//printf("==================== qui\n");
-	//buffer_size = read(pic_fd, *pic_message_buffer, MAX_PIC_MES_LENGHT);
-	read(pic_fd, (*pic_message_buffer+(buffer_size)),1);
-	while(*(pic_message_buffer[0]+buffer_size)!=0xa){
+	read(pic_fd, (*pic_message_buffer + (buffer_size)), 1);
+  
+	while(*(pic_message_buffer[0] + buffer_size) != 0xa)
+  {
 		++buffer_size;
-		read(pic_fd, (*pic_message_buffer+(buffer_size)),1);
+		read(pic_fd, (*pic_message_buffer + (buffer_size)),1);
 	}
-	//	printf("%s\n", pic_message_buffer[0]);
-	//buffer_size = read(pic_fd, *pic_message_buffer,20);
-	
-	//	sync();
-	//	tcflush(pic_fd, TCIFLUSH);
-	
-	
-	
-	//___________________________________________________
-	//printf("Ok!\n");
-    //stampa_pacchetto((*pic_message_buffer), buffer_size);
+
 	printf("buffer size: %d\n", buffer_size);
-	//	buffer_size=2;     
+  
 	while (c_aux < buffer_size - 1)
-    {
+  {
 #if (PIC_LOG_TO_SCREEN == 1)
 		printf("c_aux: %d\n",c_aux);
 #endif
@@ -540,8 +509,7 @@ int analizza_pacchetto_init()
 		
 		switch (code)
 		{
-				
-				//______________________ START ___________________________________________________
+      //______________________ START ___________________________________________________
 			case PACKET_START_HEADER:
 #if (PIC_LOG_TO_SCREEN == 1)
 				printf("PACKET_START_HEADER\n");
@@ -549,52 +517,45 @@ int analizza_pacchetto_init()
 				if (steps_anomaly == 1)
 				{
 					write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
-//					sync();
-//					tcflush(pic_fd, TCOFLUSH);
 #ifdef VERBOSE
 					printf("R\n");
 #endif
-					//steps_done[0]=0;steps_done[1]=0;delta_passi[0]=0;delta_passi[1]=0;
 					steps_anomaly = 0;
 				}
 				else
 				{
-					switch (*(pic_buffer[pic_last_vel_2_write]))
+					switch(*buffer)
 					{
 							
 						case PACKET_SPEED_HEADER:
 							printf("--PACKET_SPEED_HEADER\n");
-							write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SPEED_LENGTH + 1);
-							unsigned char *p;
+							write(pic_fd, buffer, PACKET_SPEED_LENGTH + 1);
 							int vel1, vel2;
-							p = (unsigned char *) *(pic_buffer+pic_last_vel_2_write);
-							
-							vel1 = (*(p+4)<<8) | *(p+3);
+
+							vel1 = (*(buffer + 4) << 8) | *(buffer + 3);
 							vel1 = MAX_VEL - vel1;
-							vel1 = *(p+1)?-vel1:vel1;
+							vel1 = *(buffer + 1)?-vel1:vel1;
 							
-							vel2 = (*(p+6)<<8) | *(p+5);
+							vel2 = (*(buffer + 6) << 8) | *(buffer + 5);
 							vel2 = MAX_VEL - vel2;
-							vel2 = *(p+2)?-vel2:vel2;
+							vel2 = *(buffer + 2)?-vel2:vel2;
 							
 							step2vel(vel1,vel2,&last_v_ref,&last_w_ref);
 							
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
+							*buffer = 0;
 							break;
+              
 						case PACKET_SERVOING_HEADER:
 							printf("--PACKET_SERVOING_HEADER\n");
-							write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SERVOING_LENGTH + 1);
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
+							write(pic_fd, buffer, PACKET_SERVOING_LENGTH + 1);
+							*buffer = 0;
 							break;
+              
 						default:
 							printf("--DEFAULT CASE\n");
 							write(pic_fd, pic_message_timing, PACKET_TIMING_LENGTH + 1);
 							// a scanso di equivoci...
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
-							//tcflush(pic_fd, TCOFLUSH);
+							*buffer = 0;
 							break;
 					}
 				}
@@ -662,10 +623,7 @@ int analizza_pacchetto_init()
 				pthread_mutex_unlock(&mutex_acc);
 				break;
 				//_____________________________________________________________________________________________
-				
-				
-				
-				
+
 				//______________________ MAGACC ___________________________________________________
 			case PACKET_MAGACC_HEADER:
 				printf("PACKET_MAGACC_HEADER\n");
@@ -780,14 +738,6 @@ int analizza_pacchetto_init()
 				
 				break;
 				
-				/*case PACKET_MAG_OFFSET_HEADER:
-				 c_aux += get_offset_sensore((pic_message_buffer[0]) + c_aux, PACKET_MAGNETO_LENGTH, magneto, &controllo_dati);
-				 if (magneto->is_valid == TRUE)
-				 {
-				 print_sensore(magneto);
-				 }
-				 //if (controllo_dati != 1) {printf("ERR_MAGNETO\n");}
-				 break;*/
 			case PACKET_GYRO_OFFSET_HEADER:
 #if(PIC_LOG_TO_SCREEN == 1)
 				printf("PACKET_GYRO_OFFSET_HEADER\n");
@@ -854,10 +804,6 @@ int analizza_pacchetto_init()
 					}
 					else
 					{
-						//delta_passi[0]=steps_done[0]-delta_passi[0];
-						//delta_passi[1]=steps_done[1]-delta_passi[1];
-						//printf("P1: %d %d\n", delta_passi[0],delta_passi[1]);
-						//printf("SEGNI: %d %d\n", sign_motors[0],sign_motors[1]);
 						delta_passi[0] *= sign_motors[0];
 						delta_passi[1] *= sign_motors[1];
 						
@@ -896,11 +842,7 @@ int analizza_pacchetto_init()
 						
 #else
 						printf("%f %f %f\n", state[STATE_X], state[STATE_Y], state[STATE_THETA]);
-						//printf("P: %d %d\n", delta_passi[0], delta_passi[1]);
-						//printf("A: %d %d\n", steps_done[0], steps_done[1]);
-						//printf("D: %f %f %f\n", delta_state[STATE_X],delta_state[STATE_Y],delta_state[STATE_THETA]);
 #endif
-						//printf("%f %f %f\n", state[STATE_X], state[STATE_Y], state[STATE_THETA]);
 						delta_passi[0] = steps_done[0];
 						delta_passi[1] = steps_done[1];
 					}
@@ -930,20 +872,14 @@ int analizza_pacchetto_init()
 				printf("NC: c_aux %d    buffer_size %d code: %02x\n", c_aux, buffer_size, code);
 				
 #endif
-				//stampa_pacchetto(*pic_message_buffer, buffer_size);
-				//printf("ERR: %02x n %d\n", code, c_aux);
+
 				++num_packet_data_wrong;
 				controllo_dati = 0;
 				pthread_mutex_lock(&mutex_fp);
-				//fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);
-				//fprintf(fp_log, "\nN%d\n", ++num_packet_data_ok);
 				pthread_mutex_unlock(&mutex_fp);
 				return ERROR_PACKET_ANALYZED;
 				
 		}
-		//stampa_pacchetto(barile, buffer_size);
-		
-		
     }
 	
     //printf("RIMASTO: %d\n", buffer_size-c_aux);
@@ -951,10 +887,7 @@ int analizza_pacchetto_init()
     {
 		pthread_mutex_lock(&mutex_fp);
 		if (fp_log!=NULL){fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);}
-		//if (buffer_size<8)
-		//{
-		//    stampa_pacchetto((*pic_message_buffer), buffer_size);
-		//}
+
 		pthread_mutex_unlock(&mutex_fp);
 		clock_counter++;
 		return LOAD_PACKET_ANALYZED;
@@ -966,9 +899,6 @@ int analizza_pacchetto_init()
 		printf("-----------------------------------------------------------------\n");
 		pthread_mutex_unlock(&mutex_fp);
 		clock_counter++;
-		//wait_flag = 0;
-		//printf("e\n");
-		//stampa_pacchetto(*pic_message_buffer, buffer_size);
 		return ERROR_PACKET_ANALYZED;
 		
     }
@@ -978,7 +908,7 @@ int analizza_pacchetto_init()
 
 
 //------------------------------------------------------------------------------
-int analizza_pacchetto(unsigned char *buf,int buffer_size)
+int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf,int buffer_size)
 {
 
     int c_aux = 0;
@@ -1017,37 +947,35 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 				}
 				else
 				{
-					switch (*(pic_buffer[pic_last_vel_2_write]))
+					switch(*pic_buffer)
 					{
 							
 						case PACKET_SPEED_HEADER:
 #if(PIC_LOG_TO_SCREEN == 1)
 							printf("--PACKET_SPEED_HEADER\n");
 #endif
-							write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SPEED_LENGTH + 1);
-							unsigned char *p;
+							write(pic_fd, pic_buffer, PACKET_SPEED_LENGTH + 1);
 							int vel1, vel2;
-							p = (unsigned char *) *(pic_buffer+pic_last_vel_2_write);
-							
-							vel1 = (*(p+4)<<8) | *(p+3);
+
+							vel1 = (*(pic_buffer + 4) << 8) | *(pic_buffer + 3);
 							vel1 = MAX_VEL - vel1;
-							vel1 = *(p+1)?-vel1:vel1;
+							vel1 = *(pic_buffer + 1)?-vel1:vel1;
 							
-							vel2 = (*(p+6)<<8) | *(p+5);
+							vel2 = (*(pic_buffer + 6) << 8) | *(pic_buffer + 5);
 							vel2 = MAX_VEL - vel2;
-							vel2 = *(p+2)?-vel2:vel2;
+							vel2 = *(pic_buffer + 2)?-vel2:vel2;
 							
 							step2vel(vel1,vel2,&last_v_ref,&last_w_ref);
 							
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
+							*pic_buffer = 0;
 //							sync();
 							break;
 						case PACKET_SERVOING_HEADER:
 #if(PIC_LOG_TO_SCREEN == 1)
 							printf("--PACKET_SERVOING_HEADER\n");
 #endif
-							write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SERVOING_LENGTH + 1);
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
+							write(pic_fd, pic_buffer, PACKET_SERVOING_LENGTH + 1);
+							*pic_buffer = 0;
 //							sync();
 							break;
 						default:
@@ -1056,9 +984,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 #endif
 							write(pic_fd, pic_message_timing, PACKET_TIMING_LENGTH + 1);
 							// a scanso di equivoci...
-							*(pic_buffer[pic_last_vel_2_write]) = 0;
-//							sync();
-							//tcflush(pic_fd, TCOFLUSH);
+							*pic_buffer = 0;
 							break;
 					}
 				}
@@ -1415,8 +1341,6 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 				printf("NC: c_aux %d    buffer_size %d code: %02x\n", c_aux, buffer_size, code);
 				
 #endif
-				//stampa_pacchetto(*pic_message_buffer, buffer_size);
-				//printf("ERR: %02x n %d\n", code, c_aux);
 				++num_packet_data_wrong;
 				controllo_dati = 0;
 				pthread_mutex_lock(&mutex_fp);
@@ -1426,9 +1350,6 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 				return ERROR_PACKET_ANALYZED;
 				
 		}
-		//stampa_pacchetto(barile, buffer_size);
-		
-		
     }
 	
     //printf("RIMASTO: %d\n", buffer_size-c_aux);
@@ -1436,10 +1357,7 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
     {
 		pthread_mutex_lock(&mutex_fp);
 		if (fp_log!=NULL) {fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);}
-		//if (buffer_size<8)
-		//{
-		//    stampa_pacchetto((*pic_message_buffer), buffer_size);
-		//}
+
 		pthread_mutex_unlock(&mutex_fp);
 		clock_counter++;
 		return LOAD_PACKET_ANALYZED;
@@ -1451,9 +1369,6 @@ int analizza_pacchetto(unsigned char *buf,int buffer_size)
 		printf("-----------------------------------------------------------------\n");
 		pthread_mutex_unlock(&mutex_fp);
 		clock_counter++;
-		//wait_flag = 0;
-		//printf("e\n");
-		//stampa_pacchetto(*pic_message_buffer, buffer_size);
 		return ERROR_PACKET_ANALYZED;
 		
     }

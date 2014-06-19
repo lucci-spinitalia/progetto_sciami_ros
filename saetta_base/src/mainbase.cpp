@@ -10,14 +10,11 @@
  * 
  * da netus2pic/serial_comm.h :
  * pic_fd
- * pic_buffer
  * flag
  * PACKET_TIMING_LENGTH
  * 
  * da netus2pic/robot_comm.h :
  * LEN_PIC_BUFFER
- * pic_last_vel_2_send
- * pic_last_vel_2_write
  * pic_message_reset_steps_acc
  * 
  * da core/pic2netus.h
@@ -53,14 +50,7 @@ void termination_handler(int signum)
     pthread_mutex_destroy(&tmutex);  
     pthread_cancel(thread_pic);
 
-    // Clean the buffer	
-    tcflush(pic_fd, TCIFLUSH);
-    tcflush(pic_fd, TCOFLUSH);	
-
-    set_vel_2_array(pic_buffer[pic_last_vel_2_send], 0, 0);
-    write(pic_fd, pic_buffer[pic_last_vel_2_write], PACKET_SPEED_LENGTH + 1);
-    sync();
-    close_serial_comm(); // da serial_comm.c
+    close_robot_comm();
     exit(0);
 }
 
@@ -104,20 +94,16 @@ int main(int argc, char** argv)
     set_interface_attribs (myfd, B115200, 0);
     close(myfd);
     
-    init_robot();
-    
-    // start serial communication
-    init_modulo_comm(nPort_char); //da robot_comm.c
-    printf("- Communication started!\n");
+    if(init_robot(nPort_char) < 0)
+      return -1;
+    else
+      printf("- Communication started!\n");
     
     delete[] nPort_char; //free memory
     flag = 0;  //verificare se serve
     float* robot_state = (float *) malloc(sizeof (float) *3);
 
-    for (i = 0; i < LEN_PIC_BUFFER; i++) 
-    {
-        set_vel_2_array(pic_buffer[i], starting_speed, starting_speed);
-    }
+    set_vel_2_array(starting_speed, starting_speed);
 
     write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
     tcflush(pic_fd, TCOFLUSH);
@@ -147,63 +133,6 @@ int main(int argc, char** argv)
     }
 
     return (EXIT_SUCCESS);
-}
-
-
-/* thread per il PIC */
-void* tf_pic2netus(void *args) 
-{
-    unsigned char buf[256];
-    int byte_read;
-    int an_ret;
-    tcflush(pic_fd, TCIFLUSH);
-    tcflush(pic_fd, TCOFLUSH);
-    int rr;
-    // Hook cycle
-    do 
-    {	
-        rr=read(pic_fd, buf, 1);
-        
-    }   while(buf[0]!=0x0A);
-    
-    while(1) 
-    {
-        memset(buf,'\0',128);
-        byte_read=0;
-        // Get the start
-        do 
-        {
-            read(pic_fd, buf, 1);
-            
-        }   while(buf[0]!='S');
-        
-        byte_read++;
-        // Get the whole pkg    
-        do 
-        {
-            read(pic_fd,buf+byte_read,1);
-            byte_read++;
-            
-        }   while(*(buf+byte_read-1)!='\n');
-        
-        analizza_pacchetto(buf,byte_read);
-        byte_read = 0;
-        // Get the whole pkg
-        memset(buf,'\0',128);
-        byte_read = 0;
-        do 
-        {
-            read(pic_fd,buf+byte_read,1);
-            byte_read++;
-        }
-        while(*(buf+byte_read-1)!='\n');
-        an_ret = analizza_pacchetto(buf,byte_read);
-        if (an_ret == LOAD_PACKET_ANALYZED )
-        {
-            pthread_cond_signal(&cond); //riparte il ciclo ROS
-        }
-    }
-    return 0;
 }
 
 

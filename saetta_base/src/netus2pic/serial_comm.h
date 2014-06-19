@@ -195,7 +195,7 @@ int tty_open(char* tty_dev);								//	opening serial port with interrupt on 0x0
 Apertura della porta seriale-pic: viene settato un interrupt alla ricezione del carattere '\n' (INVIO)
 @brief Inizializzazione  della porta seriale-pic
 */
-void init_serial_comm();		//	initialization of both physical and data structures serial port
+int init_serial_comm();		//	initialization of both physical and data structures serial port
 void close_serial_comm();
 #ifdef __cplusplus
 }

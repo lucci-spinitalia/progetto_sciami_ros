@@ -93,16 +93,9 @@ int					num_packet_data_wrong;			//	nomber of total received packets
 ///\brief	number of corrupted sent packets
 int					num_packet_sent_wrong;			//	nomber of total received packets
 
-//------------------------------------------------------------------------------
-///\brief	last command written to the pic buffer
-unsigned short int		pic_last_vel_2_write;					//	last correct vel received
-///\brief	last speed to send to the pic
-unsigned short int		pic_last_vel_2_send;					//	last correct vel received
-
 ///\brief	dimensione del pacchetto di ricezione per comunicazione da PIC
 int 				pic_buffer_size;				//	size of joy buffer
-///\brief	pacchetto di ricezione per comunicazione da PIC
-unsigned char*			pic_buffer[LEN_PIC_BUFFER];		//	joy buffer
+
 ///\brief	pacchetto di ricezione per comunicazione da PIC con mascheramento
 unsigned char 			pic_buffer_raw[MAX_LEN_RAW_PIC_PACKET];	//	raw joy packet
 ///\brief	pacchetto di ricezione per comunicazione da pic "smascherato" (cioè filtrato)
@@ -124,7 +117,7 @@ static unsigned char			pic_message_reset_steps_acc[4]={131,0x7D, 0xFF, 0x0A};	//
 Funzione di inizializzazione dei vari moduli di comunicazione (pic e radio)
 @brief Inizializzazione  della porta seriale-pic e dei buffer di comunicazione
 */
-void 	init_modulo_comm(char* portname);				//	comm module initialization
+int init_modulo_comm(char* portname);				//	comm module initialization
 
 //		operazioni sul pacchetto vel
 
@@ -138,7 +131,7 @@ Creazione diretta dell'array da inviare al PIC per un comando in velocità
 @param[in] vel2  	velocità motore 2
 */
 
-void	set_vel_2_array(unsigned char *p, int vel1, int vel2);
+void	set_vel_2_array(int vel1, int vel2);
 
 /**
 Creazione diretta dell'array da inviare al PIC per un comando in posizione
@@ -195,13 +188,6 @@ Funzione per il check del crc
 @return 	1 se è andata bene
 */
 int 	controlla_crc(unsigned char* p, int len);
-//		packet printing - debug function
-/**
-Funzione per la stama a video di un pacchetto
-@param[in] slot puntatore al pacchetto
-@param[in] l lunghezza del pacchettoo
-*/
-void 	stampa_pacchetto(unsigned char* slot, int l);		//debug function
 
 //		auxiliar internal function
 //-------------------------------------------
@@ -217,18 +203,7 @@ int 	check_soglia(unsigned char* pac);
 */
 int 	get_fine_pacchetto(unsigned char* p);	
 
-/**
-@brief pic_bufferto nel buffer dell'ultimo pacchetto ricevuto
-@param[in] len lunghezza in byte del pacchetto ricevuto
-*/
-int 	inserisci_in_pic_buffer(int len);	// insert a correct vel into the buffer
-/**
-@brief	Stampa a video del buffer
-*/
-void 	show_pic_buffer();					// buffer printing - debug structure
-//-------------------------------------------
-
-//char 		ack_packet[]={0x7f, 00, 00 ,00, 04, 00, 04, 01, 0x78 ,0xff,0x0a};
+void* tf_pic2netus(void *args);
 #ifdef __cplusplus
 }
 #endif

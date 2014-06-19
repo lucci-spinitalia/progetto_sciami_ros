@@ -4,7 +4,8 @@
 
 //------------------------------------------------------------------------------
 
-void init_robot() {
+int init_robot(char* portname) 
+{
     //=====================================
     //			Init
     clock_counter = 0;
@@ -19,7 +20,10 @@ void init_robot() {
     pthread_mutex_init(&mutex_acc, NULL);
     pthread_mutex_init(&mutex_magneto, NULL);
     init_sensors();
-    //init_modulo_comm();
+    
+    // start serial communication
+    if(init_modulo_comm(nPort_char) < 0) //da robot_comm.c
+      return -1;    
 }
 
 //------------------------------------------------------------------------------
@@ -180,12 +184,6 @@ int get_offset_sensore(unsigned char* payload, int l, sensore s, int *verifica) 
 
     printf("RICEVUTO OFFSET: %d\n", *s->bias);
     printf("*********************************************************************************************************************\n");
-    //printf("Integrita': %d\n", s->is_valid);
-    ///printf("------------\n");
-    //-------------------------------------
-
-    //if(contatore!=0){printf("**");stampa_pacchetto(payload, l);printf("\n");}
-    //-------------------------------------
     *verifica &= (contatore == 0);
 
     return j;
@@ -217,11 +215,9 @@ int cartesian_controller(float *state_r, float *goal_r, float k_v, float k_w, fl
 	err=sqrt( pow(delta[STATE_X],2)+pow(delta[STATE_Y],2));
 
 	if (err > 1) {	// cm
-		//printf("delta: %f %f %f\n", delta[0], delta[1], delta[2]);
 
     		*w_return = k_w * delta[STATE_THETA];
 
-    		//*v_return = k_v * (sqrt(delta[STATE_X] * delta[STATE_X] + delta[STATE_Y] * delta[STATE_Y]));
     		//Alternativa
     		*v_return=k_v*(delta[STATE_X]*cos(*(state_r+STATE_THETA))+delta[STATE_Y]*sin(*(state_r+STATE_THETA)));
     
@@ -237,10 +233,7 @@ int cartesian_controller(float *state_r, float *goal_r, float k_v, float k_w, fl
 		if (*w_return!=0 && *v_return==0) {
 			ratio = MAX_TURN_RATE / fabs(*w_return);
 		}
-	
 
-
-    		//printf("INGRESSI: %f %f\n", *v_return, *w_return);
     		if (ratio < 1.0) {
 			printf("ratio: %f\n",ratio);  
 			*w_return *= ratio;
@@ -399,7 +392,7 @@ float linear_speed_limited=*linear_speed;
         pulse_m2 = pulse_m2 / abs(pulse_m2)*(1024 - abs(pulse_m2));
     }
     /*Writing onto the pic serial buffer*/
-    set_vel_2_array(pic_buffer[pic_last_vel_2_send], pulse_m1, pulse_m2);
+    set_vel_2_array(pulse_m1, pulse_m2);
 	// Save the latest translational and rotational velocities
     last_v_ref = linear_speed_limited;
     last_w_ref =  angular_speed_limited;

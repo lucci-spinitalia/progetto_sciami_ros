@@ -157,15 +157,15 @@ int creaTabellaMagneto(structMag **im);
 /**
 *TODO
 */
-inline void gyro_zero_setting();
+inline void gyro_zero_setting(unsigned char *pic_buffer);
 /**
 *TODO
 */
-inline void calibrazione_magneto();
+inline void calibrazione_magneto(unsigned char *pic_buffer);
 /**
 *TODO
 */
-inline void magneto_zero_setting();
+inline void magneto_zero_setting(unsigned char *pic_buffer);
 
 void close_sensors();
 #ifdef __cplusplus

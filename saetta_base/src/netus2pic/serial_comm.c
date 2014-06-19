@@ -1,17 +1,26 @@
 #include "serial_comm.h"
 
 // Pic
-void init_serial_comm(char* portname){
+int init_serial_comm(char* portname)
+{
 	pthread_mutex_init(&m_analizza_pacchetto, NULL);
     //Variabile contatore
 	int i;
 	//open_port(c, 0, 1, 0);
 	//tty_open(PIC_DEVICE);
-        tty_open(portname);
+  if(tty_open(portname) == -1)
+    return -1;
+    
 	//tty_open_rfid();
 	//apri_seriale();
-	for(i=0;i<N_PIC_MES_BUFF;i++){*(pic_message_buffer+i)=malloc(MAX_PIC_MES_LENGHT*sizeof(unsigned char));}
-	current_pic_packet_slot=0;
+	for(i=0; i < N_PIC_MES_BUFF; i++)
+  {
+    *(pic_message_buffer + i) = malloc(MAX_PIC_MES_LENGHT * sizeof(unsigned char));
+  }
+  
+	current_pic_packet_slot = 0;
+  
+  return 1;
 }
 //______________________________________________________________________________
 

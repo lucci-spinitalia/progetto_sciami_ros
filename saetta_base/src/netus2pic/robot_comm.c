@@ -1,37 +1,42 @@
 
 #include "robot_comm.h"
 
-//______________________________________________________________________________
-//______________________________________________________________________________
-//______________________________________________________________________________
+///\brief	pacchetto di ricezione per comunicazione da PIC
+unsigned char* pic_buffer;
 
-//------------------------------------------------------------------------------
-void 	init_modulo_comm(char* portname){
-	
-	
-	int i;
-	pic_last_vel_2_write=0;
-	for(i=0;i<LEN_PIC_BUFFER;i++){
-		pic_buffer[i]=malloc(MAX_LEN_PIC_PACKET*sizeof(unsigned char));
-		set_vel_2_array(pic_buffer[i],10,10);
-	}
-	for(i=0;i<MAX_LEN_PIC_PACKET;i++){pic_buffer_raw[i]=0;}
+int init_modulo_comm(char* portname)
+{
+  pic_buffer = malloc(MAX_LEN_PIC_PACKET * sizeof(unsigned char));
+  
+  if(pic_buffer == NULL)
+    return 0;
+    
+  set_vel_2_array(10,10);
+
+	for(i = 0; i < MAX_LEN_PIC_PACKET; i++)
+  {
+    pic_buffer_raw[i] = 0;
+  }
 
 	num_packet_data_ok=0;
 	num_packet_data_wrong=0;
 	num_packet_sent_wrong=0;
-	init_serial_comm(portname);
+  
+	if(init_serial_comm(portname) < 0)
+    return -1;
+    
 	#ifdef USA_XBEE
 		inizializza_xbee();	
 	#endif
 	
+  
+  return 1;
 }
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 void send_vel_packet_2_pic(packet_vel v){
 	write(pic_fd, v, PACKET_SPEED_LENGTH+1);
-	//stampa_pacchetto(v, PACKET_SPEED_LENGTH);
 }
 //------------------------------------------------------------------------------
 
@@ -69,9 +74,7 @@ int pulisci_pacchetto(unsigned char *pacchetto_sporco, unsigned char *pacchetto_
 
 	int i,j;
 	i=0;j=0;
-	//printf("----------------------\n");
-	//stampa_pacchetto(pacchetto_sporco, len_sporco);
-	//printf("----------------------\n");
+
 	for(i=0;i<len_sporco;i++){
 		
 		if(*(pacchetto_sporco+i)==PACKET_SOGLIA){*(pacchetto_sporco+(++i))-=PACKET_SOGLIA;}
@@ -79,10 +82,6 @@ int pulisci_pacchetto(unsigned char *pacchetto_sporco, unsigned char *pacchetto_
 		j++;
 	
 	}
-//	printf("llllllllllllllllllllll\n");
-//	stampa_pacchetto(pacchetto_pulito, j);
-//	printf("llllllllllllllllllllll\n");
-//	printf("Valore di ritorno J: %d\n", j);
 	
 	return j;
 }
@@ -105,22 +104,6 @@ int controlla_crc(unsigned char* p, int len){
 	return contatore==crc;
 }
 //----------------------------------------------------------------------
-
-
-
-
-//------------------------------------------------------------------------------
-void stampa_pacchetto(unsigned char* slot, int l){
-	
-	int i;	
-	//printf("Length: %d\n", l);
-	for(i=0;i<l;i++)	{
-		printf("%02x ", *(slot+i));	
-	}
-	printf("\n");
-}
-//------------------------------------------------------------------------------
-
 
 //----------------------------------------------------------------------
 int check_soglia(unsigned char* pac){
@@ -150,77 +133,33 @@ int get_fine_pacchetto(unsigned char* p){
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-int inserisci_in_pic_buffer(int len){
 
-	int start, end, l, len_packet=0;
-
-	start=0;
-	end=0;
-
-	while(end<len){
-		start=end;
-		l=get_fine_pacchetto(&(pic_buffer_raw[start]));
-		if(l!=-1){
-			len_packet=pulisci_pacchetto(&(pic_buffer_raw[start]),&(pic_packet_good[0]), l+1);
-			if(controlla_crc(pic_packet_good, len_packet)){
-				//pic_last_vel_2_write=(++pic_last_vel_2_write)%LEN_PIC_BUFFER;
-				++pic_last_vel_2_write;
-				pic_last_vel_2_write%=LEN_PIC_BUFFER;
-				memcpy(pic_buffer[pic_last_vel_2_write], pic_packet_good, len_packet);
-				//stampa_pacchetto(pic_buffer[pic_last_vel_2_write], len_packet);
-			}
-
-			end+=l;
-			++end;
-		}
-		else{return -1;}
-	}
-	return 1;
-}
-//------------------------------------------------------------------------------
-
-	
-//------------------------------------------------------------------------------
-
-void show_pic_buffer(){
-
-	int i;
-	for(i=0;i<LEN_PIC_BUFFER;i++){
-		stampa_pacchetto(pic_buffer[i], MAX_LEN_PIC_PACKET);
-	}
-}
-//------------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------------
-
-void set_vel_2_array(unsigned char *p, int vel1, int vel2){
-
-
+void set_vel_2_array(int vel1, int vel2)
+{
 	unsigned int crc;
 	int i;
 	crc=0;
-	*p=0x7F;
+	*pic_buffer[0] = 0x7F;
 	
-	*(p+1)=(vel1<0);
-	*(p+2)=(vel2<0);
+	*(pic_buffer[1])=(vel1<0);
+	*(pic_buffer[2])=(vel2<0);
 	
-	*(p+3)=(MAX_VEL-abs(vel1))&255;
-	*(p+4)=(MAX_VEL-abs(vel1))>>8;
+	*(pic_buffer[3])=(MAX_VEL-abs(vel1))&255;
+	*(pic_buffer[4])=(MAX_VEL-abs(vel1))>>8;
 
 	
-	*(p+5)=(MAX_VEL-abs(vel2))&255;
-	*(p+6)=(MAX_VEL-abs(vel2))>>8;
+	*(pic_buffer[5])=(MAX_VEL-abs(vel2))&255;
+	*(pic_buffer[6])=(MAX_VEL-abs(vel2))>>8;
 	
-	*(p+7)=!(vel1==0 & vel2==0);
+	*(pic_buffer[7])=!(vel1==0 & vel2==0);
 	for(i=0;i<8;i++){
 		crc+=*(p+i);
 	}
 	crc=(~crc);
 	crc++;
-	*(p+8)=crc&255;	
-	*(p+9)=crc>>8;
-	*(p+10)=0xa;	
+	*(pic_buffer[8])=crc&255;	
+	*(pic_buffer[9])=crc>>8;
+	*(pic_buffer[10])=0xa;	
 
 }
 //------------------------------------------------------------------------------
@@ -263,51 +202,72 @@ void set_pos_2_array(unsigned char *p, int vel1, int vel2, int p1, int p2){
 
 }
 
-void    close_robot_comm()
+/* thread per il PIC */
+void* tf_pic2netus(void *args) 
 {
-	int i;
-	
-	for(i=0;i<LEN_PIC_BUFFER;i++)
-	{
-		free(pic_buffer[i]);
-	}
+    unsigned char buf[256];
+    int byte_read;
+    int an_ret;
+    tcflush(pic_fd, TCIFLUSH);
+    tcflush(pic_fd, TCOFLUSH);
+    int rr;
+    // Hook cycle
+    do 
+    {	
+        rr=read(pic_fd, buf, 1);
+        
+    }   while(buf[0]!=0x0A);
+    
+    while(1) 
+    {
+        memset(buf,'\0',128);
+        byte_read=0;
+        // Get the start
+        do 
+        {
+            read(pic_fd, buf, 1);
+            
+        }   while(buf[0]!='S');
+        
+        byte_read++;
+        // Get the whole pkg    
+        do 
+        {
+            read(pic_fd,buf+byte_read,1);
+            byte_read++;
+            
+        }   while(*(buf+byte_read-1)!='\n');
+        
+        analizza_pacchetto(pic_buffer, buf, byte_read);
+        byte_read = 0;
+        // Get the whole pkg
+        memset(buf,'\0',128);
+        byte_read = 0;
+        do 
+        {
+            read(pic_fd,buf+byte_read,1);
+            byte_read++;
+        }
+        while(*(buf+byte_read-1)!='\n');
+        an_ret = analizza_pacchetto(pic_buffer, buf, byte_read);
+        if (an_ret == LOAD_PACKET_ANALYZED )
+        {
+            pthread_cond_signal(&cond); //riparte il ciclo ROS
+        }
+    }
+    return 0;
 }
 
+void close_robot_comm()
+{
+  // Clean the buffer	
+  tcflush(pic_fd, TCIFLUSH);
+  tcflush(pic_fd, TCOFLUSH);	
 
-//------------------------------------------------------------------------------
-
-
-//Codice da utilizzare in fase di Debugging
-//Unuseful!
-
-
-
-
-		/*
-		*(pic_buffer[i])=0x7F;
-		*(pic_buffer[i]+1)=0;
-		*(pic_buffer[i]+2)=0;
-		*(pic_buffer[i]+3)=0;
-		*(pic_buffer[i]+4)=4;
-		*(pic_buffer[i]+5)=0;	
-		*(pic_buffer[i]+6)=4;
-		*(pic_buffer[i]+7)=0;
-		//*(pic_buffer[i]+8)=0x7D;
-		//*(pic_buffer[i]+9)=0xFF;
-
-		*(pic_buffer[i]+8)=0x79;
-		*(pic_buffer[i]+9)=0xFF;
-		*(pic_buffer[i]+10)=0x0A;*/
-		
-		/**(pic_buffer[i])=0x7F;
-		*(pic_buffer[i]+1)=0;
-		*(pic_buffer[i]+2)=0;
-		*(pic_buffer[i]+3)=0;
-		*(pic_buffer[i]+4)=2;
-		*(pic_buffer[i]+5)=0;
-		*(pic_buffer[i]+6)=2;
-		*(pic_buffer[i]+7)=1;
-		*(pic_buffer[i]+8)=0x7C;
-		*(pic_buffer[i]+9)=0xFF;
-		*(pic_buffer[i]+10)=0x0A;*/
-
+  set_vel_2_array(0, 0);
+  write(pic_fd, pic_buffer, PACKET_SPEED_LENGTH + 1);
+  sync();
+    
+  close_serial_comm(); // da serial_comm.c
+  free(pic_buffer);
+}
