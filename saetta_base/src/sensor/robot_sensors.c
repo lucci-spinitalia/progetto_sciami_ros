@@ -6,9 +6,6 @@
 
 void init_sensors()
 {
-
-
-
     init_sensore(&gyro, NUM_GYRO);
     //init_sensore(&acc, NUM_ACC);
     init_sensore(&acc, 1);

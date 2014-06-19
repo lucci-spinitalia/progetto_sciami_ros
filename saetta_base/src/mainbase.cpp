@@ -92,15 +92,7 @@ int main(int argc, char** argv)
     nPort_char[nPort.size()] = '\0'; // terminating char* with 0
     
     // print the serial port
-    printf("- Starting serial communication with the serial port: ");
-    
-    int i = 0;
-    while(nPort_char[i]!='\0')
-    {
-        printf("%c",nPort_char[i]);
-        i++;
-    }
-    printf("\n");
+    printf("- Starting serial communication with the serial port: %s\n", nPort_char);
     
     int myfd = open (nPort_char, O_RDWR | O_NOCTTY | O_SYNC);
     if (myfd < 0)
@@ -108,6 +100,7 @@ int main(int argc, char** argv)
         printf ("error %d opening %s: %s", errno, nPort_char, strerror (errno));
         return -1;
     }
+    
     set_interface_attribs (myfd, B115200, 0);
     close(myfd);
     
@@ -116,6 +109,7 @@ int main(int argc, char** argv)
     // start serial communication
     init_modulo_comm(nPort_char); //da robot_comm.c
     printf("- Communication started!\n");
+    
     delete[] nPort_char; //free memory
     flag = 0;  //verificare se serve
     float* robot_state = (float *) malloc(sizeof (float) *3);
@@ -130,6 +124,7 @@ int main(int argc, char** argv)
     sync();
 
     setup_termination();  //???
+    
     // Create PIC thread
     if(pthread_create(&thread_pic,NULL,&tf_pic2netus,NULL)!= 0) 
     {
@@ -138,17 +133,17 @@ int main(int argc, char** argv)
     }
     pthread_cond_wait(&cond, &tmutex);
     pthread_mutex_unlock(&tmutex);
-    setup_termination(); //???
+
     while (n.ok())
     {
-        ros::spinOnce();
-        set_robot_speed(&(localbase->_linear),&(localbase->_angular));
-	pthread_cond_wait(&cond, &tmutex);
-	pthread_mutex_unlock(&tmutex);
-	get_robot_state(&robot_state);
-        localbase->set_position(robot_state[0],robot_state[1],robot_state[2]);
-        localbase->publish_odom();
-        r.sleep();
+      ros::spinOnce();
+      set_robot_speed(&(localbase->_linear),&(localbase->_angular));
+	  pthread_cond_wait(&cond, &tmutex);
+	  pthread_mutex_unlock(&tmutex);
+	  get_robot_state(&robot_state);
+      localbase->set_position(robot_state[0],robot_state[1],robot_state[2]);
+      localbase->publish_odom();
+      r.sleep();
     }
 
     return (EXIT_SUCCESS);

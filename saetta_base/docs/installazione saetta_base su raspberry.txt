@@ -41,6 +41,7 @@ git clone -b groovy-devel https://github.com/ros/pluginlib
 ---------------------------------------------->git clone -b hydro-devel https://github.com/ros/class_loader.git
 
 cd ..
+rm -r src/geometry_experimental/test_tf2
 catkin_make
 
 ------PACKAGE SAETTA
