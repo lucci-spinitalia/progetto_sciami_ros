@@ -40,50 +40,38 @@ pthread_mutex_unlock (&m_analizza_pacchetto);
 //______________________________________________________________________________
 // alternativa ad apri seriale
 int tty_open(char* tty_dev) {
-	struct termios new_attributes;
 
-	pic_fd = open(tty_dev,O_RDWR| O_NOCTTY | O_NONBLOCK);
-//	pic_fd = open(tty_dev,O_RDWR| O_NOCTTY  |  O_NDELAY);
-	
-	if (pic_fd<0) {
-		return -1;
-	}
-	else {
-		tcgetattr(pic_fd,&oldtio);
-		tcgetattr(pic_fd,&new_attributes);
-		
-		// Set the new attributes for the serial port
-		// http://linux.about.com/library/cmd/blcmdl3_termios.htm
-		// http://www.gnu.org/software/libc/manual/html_node/Low_002dLevel-I_002fO.html#Low_002dLevel-I_002fO
-		fcntl(pic_fd, F_SETFL, 0);	// Blocking	
-		// c_cflag
-		new_attributes.c_cflag |= CREAD;		 	// Enable receiver
-		new_attributes.c_cflag |= B115200;		 	// Set baud rate
-		//new_attributes.c_cflag |= 38400;		 	// Set baud rate
-		new_attributes.c_cflag |= CS8;			 	// 8 data bit
-	
-		// c_iflag
-		new_attributes.c_iflag |= IGNPAR;		 	// Ignore framing errors and parity errors. 
-	
-		// c_lflag
-		new_attributes.c_lflag &= ~(ICANON); 	// DISABLE canonical mode. 
-																				// Disables the special characters EOF, EOL, EOL2, 
-																				// ERASE, KILL, LNEXT, REPRINT, STATUS, and WERASE, and buffers by lines.
-		new_attributes.c_lflag &= ~(ECHO);		// DISABLE this: Echo input characters.
-		new_attributes.c_lflag &= ~(ECHOE);		// DISABLE this: If ICANON is also set, the ERASE character erases the preceding input 
-																				// character, and WERASE erases the preceding word.
-		new_attributes.c_lflag &= ~(ISIG);		// DISABLE this: When any of the characters INTR, QUIT, SUSP, 
-																				// or DSUSP are received, generate the corresponding signal.
-	  
-		new_attributes.c_cc[VMIN]=5;					// Minimum number of characters for non-canonical read.
-		new_attributes.c_cc[VTIME]=10;					// Timeout in deciseconds for non-canonical read.
-		new_attributes.c_oflag = 0;
-		new_attributes.c_oflag &= ~OPOST;
+    pic_fd = open (tty_dev, O_RDWR | O_NOCTTY | O_SYNC);
+    if (pic_fd < 0) {
+            printf ("error %d opening %s: %s", errno, tty_dev, strerror (errno));
+            return -1;
+    }
+    struct termios tty;
+    memset (&tty, 0, sizeof tty);
+    if (tcgetattr (pic_fd, &tty) != 0)
+    {
+        printf ("error %d from tcgetattr", errno);
+        return -1;
+    }
 
-		tcsetattr(pic_fd, TCSANOW, &new_attributes);
-                
-	}
-  return pic_fd;
+    cfsetospeed (&tty, B115200);
+
+    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
+    tty.c_cflag = B115200 | CS8 | CSTOPB | PARODD | CREAD | CLOCAL;
+    tty.c_cflag &= ~(PARODD | PARENB | CRTSCTS);
+    tty.c_iflag = ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON | IXOFF | IUCLC | IXANY | IMAXBEL | IUTF8);            
+    tty.c_oflag = 0;
+    tty.c_lflag = ~(ECHO | ECHOE | ECHOK | ECHONL | ECHOPRT | ECHOCTL | ECHOKE | ICANON | ISIG | IEXTEN | NOFLSH | XCASE | TOSTOP);
+    tty.c_cc[VTIME] = 10; //inter-character timer unused
+    tty.c_cc[VMIN] = 4; //blocking read
+
+    if (tcsetattr (pic_fd, TCSANOW, &tty) != 0)
+    {
+        printf ("error %d from tcsetattr", errno);
+        return -1;
+    }
+    return pic_fd;
+    
 }
 //______________________________________________________________________________
 
