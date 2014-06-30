@@ -4,19 +4,9 @@
 int init_serial_comm(char* portname)
 {
 	pthread_mutex_init(&m_analizza_pacchetto, NULL);
-    //Variabile contatore
-	int i;
-	//open_port(c, 0, 1, 0);
-	//tty_open(PIC_DEVICE);
+
   if(tty_open(portname) == -1)
     return -1;
-    
-	//tty_open_rfid();
-	//apri_seriale();
-	for(i=0; i < N_PIC_MES_BUFF; i++)
-  {
-    *(pic_message_buffer + i) = malloc(MAX_PIC_MES_LENGHT * sizeof(unsigned char));
-  }
   
 	current_pic_packet_slot = 0;
   
@@ -77,11 +67,6 @@ int tty_open(char* tty_dev) {
 
 void close_serial_comm()
 {
-int i;
-	for(i=0;i<N_PIC_MES_BUFF;i++)
-	{
-		free(pic_message_buffer[i]);
-	}
 	pthread_mutex_destroy(&m_analizza_pacchetto);
-        close(pic_fd);
+  close(pic_fd);
 }
