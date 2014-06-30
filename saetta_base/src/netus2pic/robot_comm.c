@@ -23,7 +23,11 @@ int init_modulo_comm(char* portname)
 	num_packet_data_wrong=0;
 	num_packet_sent_wrong=0;
   
-	if(init_serial_comm(portname) < 0)
+  pthread_mutex_init(&m_analizza_pacchetto, NULL);
+  //pic_fd = tty_open(portname);
+  pic_fd = com_open(portname, 115200, 'N', 8, 1);
+  
+	if(pic_fd <= 0)
     return -1;
     
 	#ifdef USA_XBEE
@@ -36,7 +40,8 @@ int init_modulo_comm(char* portname)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-void send_vel_packet_2_pic(packet_vel v){
+void send_vel_packet_2_pic(packet_vel v)
+{
 	write(pic_fd, v, PACKET_SPEED_LENGTH+1);
 }
 //------------------------------------------------------------------------------
@@ -139,30 +144,9 @@ void set_vel_2_array(int vel1, int vel2)
 {
 	unsigned int crc;
 	int i;
-	crc=0;
-	/**(pic_buffer[0]) = 0x7F;
+	crc=0;	
 	
-	*(pic_buffer[1])=(vel1<0);
-	*(pic_buffer[2])=(vel2<0);
-	
-	*(pic_buffer[3])=(MAX_VEL-abs(vel1))&255;
-	*(pic_buffer[4])=(MAX_VEL-abs(vel1))>>8;
-
-	
-	*(pic_buffer[5])=(MAX_VEL-abs(vel2))&255;
-	*(pic_buffer[6])=(MAX_VEL-abs(vel2))>>8;
-	
-	*(pic_buffer[7])=!(vel1==0 & vel2==0);
-	for(i=0;i<8;i++){
-		crc+=*(pic_buffer+i);
-	}
-	crc=(~crc);
-	crc++;
-	*(pic_buffer[8])=crc&255;	
-	*(pic_buffer[9])=crc>>8;
-	*(pic_buffer[10])=0xa;*/	
-	
-        *(pic_buffer) = 0x7F;
+  *(pic_buffer) = 0x7F;
 	
 	*(pic_buffer+1)=(vel1<0);
 	*(pic_buffer+2)=(vel2<0);
@@ -227,57 +211,63 @@ void set_pos_2_array(unsigned char *p, int vel1, int vel2, int p1, int p2){
 /* thread per il PIC */
 void* tf_pic2netus(void *args) 
 {
-    unsigned char buf[256];
-    int byte_read;
-    int an_ret;
-    tcflush(pic_fd, TCIFLUSH);
-    tcflush(pic_fd, TCOFLUSH);
-    int rr;
-    // Hook cycle
-    do 
-    {	
-        rr=read(pic_fd, buf, 1);
-        
-    }   while(buf[0]!=0x0A);
+  unsigned char buf[256];
+  int byte_read;
+  int an_ret;
+  
+  tcflush(pic_fd, TCIFLUSH);
+  tcflush(pic_fd, TCOFLUSH);
+
+  int rr;
+
+  // Hook cycle
+  do 
+  {	
+    rr = read(pic_fd, buf, 1);        
+  } while(buf[0] != 0x0A);
     
-    while(1) 
+  while(1) 
+  {
+    memset(buf,'\0',128);
+    byte_read = 0;
+  
+    // Get the start
+    do 
     {
-        memset(buf,'\0',128);
-        byte_read=0;
-        // Get the start
-        do 
-        {
-            read(pic_fd, buf, 1);
-            
-        }   while(buf[0]!='S');
+      read(pic_fd, buf, 1);        
+    } while(buf[0]!='S');
         
-        byte_read++;
-        // Get the whole pkg    
-        do 
-        {
-            read(pic_fd,buf+byte_read,1);
-            byte_read++;
-            
-        }   while(*(buf+byte_read-1)!='\n');
+    byte_read++;
+    
+    // Get the whole pkg    
+    do 
+    {
+      read(pic_fd,buf+byte_read,1);
+      byte_read++;      
+    } while(*(buf+byte_read-1)!='\n');
         
-        analizza_pacchetto(pic_buffer, buf, byte_read);
-        byte_read = 0;
-        // Get the whole pkg
-        memset(buf,'\0',128);
-        byte_read = 0;
-        do 
-        {
-            read(pic_fd,buf+byte_read,1);
-            byte_read++;
-        }
-        while(*(buf+byte_read-1)!='\n');
-        an_ret = analizza_pacchetto(pic_buffer, buf, byte_read);
-        if (an_ret == LOAD_PACKET_ANALYZED )
-        {
-            pthread_cond_signal(&cond); //riparte il ciclo ROS
-        }
+    analizza_pacchetto(pic_buffer, buf, byte_read);
+    
+    byte_read = 0;
+
+    // Get the whole pkg
+    memset(buf,'\0',128);
+    byte_read = 0;
+
+    do 
+    {
+      read(pic_fd,buf+byte_read,1);
+      byte_read++;
     }
-    return 0;
+    while(*(buf+byte_read-1)!='\n');
+  
+    an_ret = analizza_pacchetto(pic_buffer, buf, byte_read);
+  
+    if(an_ret == LOAD_PACKET_ANALYZED)
+      pthread_cond_signal(&cond); //riparte il ciclo ROS
+  }
+  
+  return 0;
 }
 
 void close_robot_comm()
@@ -289,7 +279,7 @@ void close_robot_comm()
   set_vel_2_array(0, 0);
   write(pic_fd, pic_buffer, PACKET_SPEED_LENGTH + 1);
   sync();
-    
-  close_serial_comm(); // da serial_comm.c
+
+  close_serial_comm(pic_fd); // da serial_comm.c
   free(pic_buffer);
 }

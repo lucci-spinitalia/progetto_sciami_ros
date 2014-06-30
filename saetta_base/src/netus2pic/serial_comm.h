@@ -153,20 +153,6 @@ struct 					termios oldtio;		//	aux pic port struct
 ///\brief	struttura contenente i nuovi settaggi della porta utilizzati nell'esecuzione del programma
 struct 					termios newtio;		//	aux pic port struct
 
-
-///\brief	buffer per la ricezione dei messaggi da parte del PIC
-unsigned char*			pic_message_buffer[N_PIC_MES_BUFF];	//	comm buffer
-
-///\brief	messaggio timing
-//unsigned char			pic_message_timing[4]={130,0x7E, 0xFF, 0x0A};	//	comm buffer
-
-///\brief	messaggio timing
-//unsigned char			pic_message_reset_steps_acc[4]={131,0x7D, 0xFF, 0x0A};	//	comm buffer
-
-
-///\brief	indice del pacchetto corrente da analizzare all'interno del buffer di ricezione dei messaggi da parte del PIC
-int  					current_pic_packet_slot;			//	firs slot available in com buffer
-
 ///\brief	mutex per il flag su seriale
 pthread_mutex_t mutex_wait_flag;
 
@@ -190,13 +176,7 @@ Apertura della porta seriale-pic
 *\return pic_fd Pic file descriptor id
 */
 int tty_open(char* tty_dev);								//	opening serial port with interrupt on 0x0A char reception
-
-/**
-Apertura della porta seriale-pic: viene settato un interrupt alla ricezione del carattere '\n' (INVIO)
-@brief Inizializzazione  della porta seriale-pic
-*/
-int init_serial_comm();		//	initialization of both physical and data structures serial port
-void close_serial_comm();
+void close_serial_comm(int tty_fd);
 #ifdef __cplusplus
 }
 #endif

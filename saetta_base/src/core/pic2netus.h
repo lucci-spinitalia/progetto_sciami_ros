@@ -5,6 +5,7 @@ extern "C" {
 #endif
 #define		PIC_LOG_TO_SCREEN	0
 #include "serial_comm.h"
+#include "../Rs232/rs232.h"
 #include "pic_rel.h"
 #include "robot_core.h"
 #include "sensor_struct.h"

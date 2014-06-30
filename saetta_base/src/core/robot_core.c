@@ -6,24 +6,28 @@
 
 int init_robot(char* portname) 
 {
-    //=====================================
-    //			Init
-    clock_counter = 0;
-    //Packet Type
-    packet_type = ERROR_PACKET_ANALYZED;
-    //=====================================
-    //
-    pthread_mutex_init(&mutex_fp, NULL);
-    pthread_mutex_init(&mutex_state, NULL);
-    pthread_mutex_init(&mutex_ir, NULL);
-    pthread_mutex_init(&mutex_gyro, NULL);
-    pthread_mutex_init(&mutex_acc, NULL);
-    pthread_mutex_init(&mutex_magneto, NULL);
-    init_sensors();
+  //=====================================
+  //			Init
+  clock_counter = 0;
+  //Packet Type
+  packet_type = ERROR_PACKET_ANALYZED;
+  //=====================================
+  //
+  pthread_mutex_init(&mutex_fp, NULL);
+  pthread_mutex_init(&mutex_state, NULL);
+  pthread_mutex_init(&mutex_ir, NULL);
+  pthread_mutex_init(&mutex_gyro, NULL);
+  pthread_mutex_init(&mutex_acc, NULL);
+  pthread_mutex_init(&mutex_magneto, NULL);
+  init_sensors();
     
-    // start serial communication
-    if(init_modulo_comm(portname) < 0) //da robot_comm.c
-      return -1;    
+  // start serial communication
+  if(init_modulo_comm(portname) < 0) //da robot_comm.c
+    return -1;
+
+  write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
+  tcflush(pic_fd, TCOFLUSH);
+  sync();      
 }
 
 //------------------------------------------------------------------------------

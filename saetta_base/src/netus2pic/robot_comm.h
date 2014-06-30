@@ -10,6 +10,7 @@ extern "C" {
 #include <string.h>    
 #include <unistd.h>    
 #include "serial_comm.h"
+#include "../Rs232/rs232.h"
 #include "pic2netus.h"
 #include "robot_comm.h"
 
