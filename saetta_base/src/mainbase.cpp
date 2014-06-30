@@ -25,15 +25,11 @@
 
 using namespace std;
 
-pthread_t thread_pic;
-pthread_mutex_t tmutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
 
 
 void setup_termination();
 void termination_handler(int signum);
-void* tf_pic2netus(void *args);
-int set_interface_attribs (int fd, int speed, int parity);
 
 
 
@@ -84,16 +80,6 @@ int main(int argc, char** argv)
     // print the serial port
     printf("- Starting serial communication with the serial port: %s\n", nPort_char);
     
-    int myfd = open (nPort_char, O_RDWR | O_NOCTTY | O_SYNC);
-    if (myfd < 0)
-    {
-        printf ("error %d opening %s: %s", errno, nPort_char, strerror (errno));
-        return -1;
-    }
-    
-    set_interface_attribs (myfd, B115200, 0);
-    close(myfd);
-    
     if(init_robot(nPort_char) < 0)
       return -1;
     else
@@ -122,40 +108,16 @@ int main(int argc, char** argv)
 
     while (n.ok())
     {
-      ros::spinOnce();
-      set_robot_speed(&(localbase->_linear),&(localbase->_angular));
-	  pthread_cond_wait(&cond, &tmutex);
-	  pthread_mutex_unlock(&tmutex);
-	  get_robot_state(&robot_state);
-      localbase->set_position(robot_state[0],robot_state[1],robot_state[2]);
-      localbase->publish_odom();
-      r.sleep();
+        ros::spinOnce();
+        set_robot_speed(&(localbase->_linear),&(localbase->_angular));
+        pthread_cond_wait(&cond, &tmutex);
+        pthread_mutex_unlock(&tmutex);
+        get_robot_state(&robot_state);
+        //the robot states x and y are in [cm], we publish them in [m]
+        localbase->set_position(robot_state[0]/100,robot_state[1]/100,robot_state[2]); 
+        localbase->publish_odom();
+        r.sleep();
     }
 
     return (EXIT_SUCCESS);
-}
-
-
-
-int set_interface_attribs (int fd, int speed, int parity)
-{
-    struct termios tty;
-    memset (&tty, 0, sizeof tty);
-    if (tcgetattr (fd, &tty) != 0)
-    {
-        printf ("error %d from tcgetattr", errno);
-        return -1;
-    }
-
-    cfsetospeed (&tty, speed);
-    cfsetispeed (&tty, speed);
-
-    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
-
-    if (tcsetattr (fd, TCSANOW, &tty) != 0)
-    {
-        printf ("error %d from tcsetattr", errno);
-        return -1;
-    }
-    return 0;
 }

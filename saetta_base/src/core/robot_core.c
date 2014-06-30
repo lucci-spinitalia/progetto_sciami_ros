@@ -22,7 +22,7 @@ int init_robot(char* portname)
     init_sensors();
     
     // start serial communication
-    if(init_modulo_comm(nPort_char) < 0) //da robot_comm.c
+    if(init_modulo_comm(portname) < 0) //da robot_comm.c
       return -1;    
 }
 

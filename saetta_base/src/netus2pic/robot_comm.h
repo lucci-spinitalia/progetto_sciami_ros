@@ -10,7 +10,8 @@ extern "C" {
 #include <string.h>    
 #include <unistd.h>    
 #include "serial_comm.h"
-
+#include "pic2netus.h"
+#include "robot_comm.h"
 
 
 //							COSTANTI
@@ -31,7 +32,9 @@ extern "C" {
 ///\brief	FLAG per l'uso dell'xbee
 //#define 	USA_XBEE
 
-
+pthread_t thread_pic;
+pthread_mutex_t tmutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 //							STRUCTURES
 
 

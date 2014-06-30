@@ -10,10 +10,11 @@ int init_modulo_comm(char* portname)
   
   if(pic_buffer == NULL)
     return 0;
-    
+  
   set_vel_2_array(10,10);
-
-	for(i = 0; i < MAX_LEN_PIC_PACKET; i++)
+  
+  int i;
+  for(i = 0; i < MAX_LEN_PIC_PACKET; i++)
   {
     pic_buffer_raw[i] = 0;
   }
@@ -139,7 +140,7 @@ void set_vel_2_array(int vel1, int vel2)
 	unsigned int crc;
 	int i;
 	crc=0;
-	*pic_buffer[0] = 0x7F;
+	/**(pic_buffer[0]) = 0x7F;
 	
 	*(pic_buffer[1])=(vel1<0);
 	*(pic_buffer[2])=(vel2<0);
@@ -153,14 +154,35 @@ void set_vel_2_array(int vel1, int vel2)
 	
 	*(pic_buffer[7])=!(vel1==0 & vel2==0);
 	for(i=0;i<8;i++){
-		crc+=*(p+i);
+		crc+=*(pic_buffer+i);
 	}
 	crc=(~crc);
 	crc++;
 	*(pic_buffer[8])=crc&255;	
 	*(pic_buffer[9])=crc>>8;
-	*(pic_buffer[10])=0xa;	
+	*(pic_buffer[10])=0xa;*/	
+	
+        *(pic_buffer) = 0x7F;
+	
+	*(pic_buffer+1)=(vel1<0);
+	*(pic_buffer+2)=(vel2<0);
+	
+	*(pic_buffer+3)=(MAX_VEL-abs(vel1))&255;
+	*(pic_buffer+4)=(MAX_VEL-abs(vel1))>>8;
 
+	
+	*(pic_buffer+5)=(MAX_VEL-abs(vel2))&255;
+	*(pic_buffer+6)=(MAX_VEL-abs(vel2))>>8;
+	
+	*(pic_buffer+7)=!(vel1==0 & vel2==0);
+	for(i=0;i<8;i++){
+		crc+=*(pic_buffer+i);
+	}
+	crc=(~crc);
+	crc++;
+	*(pic_buffer+8)=crc&255;	
+	*(pic_buffer+9)=crc>>8;
+	*(pic_buffer+10)=0xa;
 }
 //------------------------------------------------------------------------------
 
