@@ -191,6 +191,9 @@ int main(int argc, char** argv)
                     printf("[%x]", message_buffer[i]);
                     
                   printf("\n");
+                  
+                  analizza_pacchetto(pic_buffer, message_buffer, bytes_read);
+
                   message_state = 0;
                   break;
               }
@@ -200,6 +203,7 @@ int main(int argc, char** argv)
 
         if(FD_ISSET(pic_fd, &wr))
         {
+          printf("Write operation!\n");
           bytes_sent = rs232_write(pic_fd);
         }
       }

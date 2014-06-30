@@ -861,15 +861,15 @@ int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf, int buffer
 		
 		switch (code)
 		{
-				
-				//______________________ START ___________________________________________________
-			case PACKET_START_HEADER:
+		  //______________________ START ___________________________________________________
+		  case PACKET_START_HEADER:
 #if(PIC_LOG_TO_SCREEN == 1)
 				printf("PACKET_START_HEADER\n");
 #endif
 				if (steps_anomaly == 1)
 				{
-					write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
+					//write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
+          rs232_load_tx(pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
 
 #ifdef VERBOSE
 					printf("R\n");
@@ -884,7 +884,9 @@ int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf, int buffer
 #if(PIC_LOG_TO_SCREEN == 1)
 							printf("--PACKET_SPEED_HEADER\n");
 #endif
-							write(pic_fd, pic_buffer, PACKET_SPEED_LENGTH + 1);
+							//write(pic_fd, pic_buffer, PACKET_SPEED_LENGTH + 1);
+              rs232_load_tx(pic_buffer, PACKET_SPEED_LENGTH + 1);
+              
 							int vel1, vel2;
 
 							vel1 = (*(pic_buffer + 4) << 8) | *(pic_buffer + 3);
@@ -898,21 +900,23 @@ int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf, int buffer
 							step2vel(vel1,vel2,&last_v_ref,&last_w_ref);
 							
 							*pic_buffer = 0;
-//							sync();
 							break;
 						case PACKET_SERVOING_HEADER:
 #if(PIC_LOG_TO_SCREEN == 1)
 							printf("--PACKET_SERVOING_HEADER\n");
 #endif
-							write(pic_fd, pic_buffer, PACKET_SERVOING_LENGTH + 1);
+							//write(pic_fd, pic_buffer, PACKET_SERVOING_LENGTH + 1);
+              rs232_load_tx(pic_buffer, PACKET_SERVOING_LENGTH + 1);
+              
 							*pic_buffer = 0;
-//							sync();
 							break;
 						default:
 #if(PIC_LOG_TO_SCREEN == 1)
 							printf("--DEFAULT CASE\n");
 #endif
-							write(pic_fd, pic_message_timing, PACKET_TIMING_LENGTH + 1);
+							//write(pic_fd, pic_message_timing, PACKET_TIMING_LENGTH + 1);
+              rs232_load_tx(pic_message_timing, PACKET_TIMING_LENGTH + 1);
+              
 							// a scanso di equivoci...
 							*pic_buffer = 0;
 							break;
@@ -1270,29 +1274,28 @@ int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf, int buffer
 				return ERROR_PACKET_ANALYZED;
 				
 		}
-    }
+  }
 	
     //printf("RIMASTO: %d\n", buffer_size-message_index);
-    if (controllo_dati == 1 && buffer_size>0)
-    {
-		pthread_mutex_lock(&mutex_fp);
+  if(controllo_dati == 1 && buffer_size > 0)
+  {
+		/*pthread_mutex_lock(&mutex_fp);
 		if (fp_log!=NULL) {fprintf(fp_log, "%d %d\n", ++num_packet_data_ok, buffer_size);}
 
-		pthread_mutex_unlock(&mutex_fp);
+		pthread_mutex_unlock(&mutex_fp);*/
 		clock_counter++;
 		return LOAD_PACKET_ANALYZED;
-    }
-    else
-    {
-		pthread_mutex_lock(&mutex_fp);
+  }
+  else
+  {
+		/*pthread_mutex_lock(&mutex_fp);
 		if (fp_log!=NULL){fprintf(fp_log, "\nN%d\n", ++num_packet_data_wrong);}
 		printf("-----------------------------------------------------------------\n");
-		pthread_mutex_unlock(&mutex_fp);
+		pthread_mutex_unlock(&mutex_fp);*/
 		clock_counter++;
 		return ERROR_PACKET_ANALYZED;
-		
-    }
-    return 1;
+  }
+  return 1;
 }
 
 
