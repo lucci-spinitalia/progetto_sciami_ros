@@ -226,12 +226,12 @@ void* tf_pic2netus(void *args)
   {	
     rr = read(pic_fd, buf, 1);        
   } while(buf[0] != 0x0A);
-    
+
   while(1) 
   {
     memset(buf,'\0',128);
     byte_read = 0;
-  
+
     // Get the start
     do 
     {
@@ -239,16 +239,16 @@ void* tf_pic2netus(void *args)
     } while(buf[0]!='S');
         
     byte_read++;
-    
+
     // Get the whole pkg    
     do 
     {
       read(pic_fd,buf+byte_read,1);
       byte_read++;      
     } while(*(buf+byte_read-1)!='\n');
-        
+
     analizza_pacchetto(pic_buffer, buf, byte_read);
-    
+
     byte_read = 0;
 
     // Get the whole pkg
