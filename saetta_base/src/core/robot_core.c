@@ -20,14 +20,14 @@ int init_robot(char* portname)
   pthread_mutex_init(&mutex_acc, NULL);
   pthread_mutex_init(&mutex_magneto, NULL);
   init_sensors();
-    
+
   // start serial communication
   if(init_modulo_comm(portname) < 0) //da robot_comm.c
     return -1;
 
   write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
-  tcflush(pic_fd, TCOFLUSH);
-  sync();      
+
+  return 1;
 }
 
 //------------------------------------------------------------------------------
@@ -331,6 +331,7 @@ int posture_controller(float *state_r, float *goal_r, float k_v, float k_w, floa
         *v_return *= ratio;
     }
 
+  return 1;
 }
 
 //------------------------------------------------------------------------------
@@ -346,6 +347,7 @@ int decoupled_controller(float *state_r, float *goal_r, float *set_lin_return, f
     *set_w_return = *(state_r + STATE_THETA)-*(goal_r + STATE_THETA);
     *set_lin_return = (sqrt(delta[STATE_X] * delta[STATE_X] + delta[STATE_Y] * delta[STATE_Y]));
 
+  return 1;
 }
 
 //------------------------------------------------------------------------------

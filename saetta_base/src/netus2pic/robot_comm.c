@@ -1,5 +1,6 @@
 
 #include "robot_comm.h"
+#include <termios.h> //only for tf_pic2netus function
 
 ///\brief	pacchetto di ricezione per comunicazione da PIC
 unsigned char* pic_buffer;
@@ -158,7 +159,7 @@ void set_vel_2_array(int vel1, int vel2)
 	*(pic_buffer+5)=(MAX_VEL-abs(vel2))&255;
 	*(pic_buffer+6)=(MAX_VEL-abs(vel2))>>8;
 	
-	*(pic_buffer+7)=!(vel1==0 & vel2==0);
+	*(pic_buffer+7) =!((vel1 == 0) & (vel2 == 0));
 	for(i=0;i<8;i++){
 		crc+=*(pic_buffer+i);
 	}
@@ -280,6 +281,6 @@ void close_robot_comm()
   write(pic_fd, pic_buffer, PACKET_SPEED_LENGTH + 1);
   sync();
 
-  close_serial_comm(pic_fd); // da serial_comm.c
+  close(pic_fd); // da serial_comm.c
   free(pic_buffer);
 }

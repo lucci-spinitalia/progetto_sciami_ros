@@ -72,9 +72,8 @@ int 	get_gyro_integral(unsigned char* payload, int l, short *integral, int *veri
 	
 	
     unsigned short int contatore = 0;
-	unsigned short aux;
     contatore += *payload;
-    int i, j,z;
+    int i, j;
     j = 1;
 
 	*integral=0;
@@ -309,8 +308,6 @@ int get_odometria(unsigned char* payload, int l, int *p_m1, int *p_m2, int *s1, 
 
 int print_odometria(FILE *paux, float *stato, int *passi)
 {
-	
-    int i;
     //	carattere tab
     //fprintf(paux, "\n");
     fprintf(paux, "%c", 0x09);
@@ -423,7 +420,7 @@ int analizza_pacchetto_init(unsigned char* buffer)
 	printf("-----analizza pacchetto----\n");	
 
 	message_size = 0;
-	read(pic_fd, pic_message_buffer + message_size), 1);
+	read(pic_fd, pic_message_buffer + message_size, 1);
   
 	while((pic_message_buffer + message_size) != 0xa)
   {
@@ -843,7 +840,6 @@ int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf, int buffer
   int message_index = 0;
   int controllo_dati = 1;
   unsigned int code;
-  unsigned int i;
 
   unsigned char pic_message_buffer[256];
   
@@ -1246,8 +1242,8 @@ int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf, int buffer
 				{
 #ifdef VERBOSE
 					printf("NOLOG\n");
-#endif                                  if (fp_log!=NULL){ fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);}
-                                        
+#endif
+                                        if (fp_log!=NULL){ fprintf(fp_log, "%c %f %f %f %c %d %d %c", 0x09, -1.0,-1.0,-1.0, 0x09, -1,-1,0x09);}
 				}
 				break;
 			case PACKET_ERRPIC_HEADER:

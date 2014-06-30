@@ -14,7 +14,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "serial_comm.h"
+#include "../Rs232/rs232.h"
 #include "pic2netus.h"
 #include "sensor_struct.h"
 

@@ -8,7 +8,7 @@
 
 /* LISTA VARIABILI GLOBALI PRESE DALLA LIBRERIA C
  * 
- * da netus2pic/serial_comm.h :
+ * da robot_comm.h :
  * flag
  * PACKET_TIMING_LENGTH
  * 
@@ -18,8 +18,8 @@
  * 
  * da core/pic2netus.h
  * LOAD_PACKET_ANALYZED = 2
- 
  */
+#include <signal.h>
 #include "Saetta_Base.h"
 
 /* Macro */
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
   int nfds = 0; // fd to pass to select()
   fd_set rd, wr, er; // structure for select()
   struct timeval select_timeout;
-  
+
   select_timeout.tv_sec = 0;
   select_timeout.tv_usec = 20000;
 
@@ -67,32 +67,35 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "Saetta_Base");
   ros::NodeHandle n("~");
   Saetta_Base* localbase = new Saetta_Base();
-  
+
   // Declare variables that can be modified by launch file or command line.
   int rate = 20;
-  
+
   // set velocity subscriber
   ros::Subscriber sub = n.subscribe("/saetta/velocity", 10, &Saetta_Base::listenerCallback, localbase);
 
   // Tell ROS how fast to run this node.
   ros::Rate r(rate);
-  
+
   std::string nPort; //default port name
   n.param<std::string>("port", nPort, "/dev/ttyO3");
   ROS_INFO_STREAM("ROS parameter 'port' setted as: " << nPort);
-    
+
   // convert string to char*
   char* nPort_char = new char[nPort.size() + 1];
   std::copy(nPort.begin(), nPort.end(), nPort_char);
   nPort_char[nPort.size()] = '\0'; // terminating char* with 0
 
   // print the serial port
-  printf("- Starting serial communication with the serial port: %s\n", nPort_char);
+  printf("Starting serial communication on serial port %s . . . ", nPort_char);
 
   if(init_robot(nPort_char) < 0)
+  {
+    printf("communication failed\n");
     return -1;
+  }
   else
-    printf("- Communication started!\n");
+    printf("communication started!\n");
 
   delete[] nPort_char; //free memory
   flag = 0;  //verificare se serve
@@ -100,18 +103,22 @@ int main(int argc, char** argv)
 
   // set starting speed
   set_vel_2_array(0.0, 0.0);
+  printf("Velocity set to 0\n");
 
   setup_termination();
-    
+
   // Create PIC thread
   if(pthread_create(&thread_pic, NULL, &tf_pic2netus, NULL)!= 0) 
   {
     perror("Error creating PIC thread.\n");
     return 1;
   }
-  
+
+  printf("Thread created. Waiting for mutex. . .");
+  fflush(stdout);
   pthread_cond_wait(&cond, &tmutex);
   pthread_mutex_unlock(&tmutex);
+  printf("[OK]\n");
 
   while (n.ok())
   {
