@@ -1,11 +1,24 @@
 #include "robot_core.h"
 
+char message_buffer_tx[256];
+char message_buffer_rx[256];
+char bytes_read = 0;
+char bytes_sent = 0;
+  
+int select_result = -1; // value returned frome select()
+int nfds = 0; // fd to pass to select()
+fd_set rd, wr, er; // structure for select()
+struct timeval select_timeout;
+ 
 //______________________________________________________________________________
 
 //------------------------------------------------------------------------------
 
 int init_robot(char* portname) 
 {
+  select_timeout.tv_sec = 0;
+  select_timeout.tv_usec = 20000;
+
   //=====================================
   //			Init
   clock_counter = 0;
@@ -27,6 +40,9 @@ int init_robot(char* portname)
 
   write(pic_fd, pic_message_reset_steps_acc, PACKET_TIMING_LENGTH + 1);
 
+  // set starting speed
+  set_vel_2_array(message_buffer_tx, 0.0, 0.0);
+  
   return 1;
 }
 
@@ -397,7 +413,7 @@ void set_robot_speed(float *linear_speed, float *angular_speed)
   }
   
   /*Writing onto the pic serial buffer*/
-  set_vel_2_array(pulse_m1, pulse_m2);
+  set_vel_2_array(message_buffer_tx, pulse_m1, pulse_m2);
 	// Save the latest translational and rotational velocities
   last_v_ref = linear_speed_limited;
   last_w_ref =  angular_speed_limited;
@@ -472,6 +488,97 @@ void step2vel(int step1, int step2, float *vref, float *wref) {
 
 }
 
+int robot_loop(int time_us)
+{
+  static unsigned char message_state = 0;
+  
+  FD_ZERO(&rd);
+  FD_ZERO(&wr);
+  FD_ZERO(&er);
+    
+  if(pic_fd > 0)
+  {
+    FD_SET(pic_fd, &rd);
+    nfds = max(nfds, pic_fd);
+      
+    if(rs232_buffer_tx_empty == 0)
+    {
+      FD_SET(pic_fd, &wr);
+      nfds = max(nfds, pic_fd);
+    }
+  }
+    
+  select_result = select(nfds + 1, &rd, &wr, NULL, &select_timeout);
 
+  if(select_result == -1 && errno == EAGAIN)
+  {
+    perror("select");
+    return -1;
+  }
 
+  if(select_result == -1)
+  {
+    perror("main:");
 
+    return 1;
+  }
+
+  if(select_result > 0)
+  {
+    if(pic_fd > 0)
+    {
+      if(FD_ISSET(pic_fd, &rd))
+      {
+        bytes_read = rs232_read(pic_fd);
+     
+        if((bytes_read > 0) || ((bytes_read < 0) && rs232_buffer_rx_full))
+        {
+          bytes_read = rs232_unload_rx_filtered(message_buffer_rx, 0x0a);
+
+          if(bytes_read > 0)
+          {
+            message_buffer_rx[bytes_read] = '\0';
+
+            switch(message_state)
+            {
+              case 0:
+                if(strncmp(message_buffer_rx, "START", strlen("START")) == 0)
+                {
+                  printf("Analizza pacchetto\n");
+                  message_state++;
+                }
+                break;
+                  
+              case 1:
+                int i = 0;
+                for(i = 0; i < bytes_read; i++)
+                  printf("[%x]", message_buffer_rx[i]);
+                    
+                printf("\n");
+                  
+                analizza_pacchetto(message_buffer_tx, message_buffer_rx, bytes_read);
+
+                message_state = 0;
+                break;
+            }
+          }
+        }
+      }
+
+      if(FD_ISSET(pic_fd, &wr))
+      {
+        printf("Write operation!\n");
+        bytes_sent = rs232_write(pic_fd);
+      }
+    }
+  }
+
+  if((select_timeout.tv_sec == 0) && (select_timeout.tv_usec == 0))
+  {
+    select_timeout.tv_sec = 0;
+    select_timeout.tv_usec = time_us;
+    return 1;
+  }
+  else
+    return 0;
+}

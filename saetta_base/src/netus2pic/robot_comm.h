@@ -12,7 +12,6 @@ extern "C" {
 #include <pthread.h>
 #include "../Rs232/rs232.h"
 #include "pic2netus.h"
-#include "robot_comm.h"
 
 
 //							COSTANTI
@@ -130,6 +129,8 @@ pthread_mutex_t m_io;
 ///\brief		lunghezza del pacchetto timing
 #define 		PACKET_TIMING_LENGTH		3
 
+///\brief	pacchetto di ricezione per comunicazione da PIC
+unsigned char* pic_buffer;
 
 ///\brief	pic file descriptor
 int 					pic_fd;
@@ -258,7 +259,7 @@ Creazione diretta dell'array da inviare al PIC per un comando in velocità
 @param[in] vel2  	velocità motore 2
 */
 
-void	set_vel_2_array(int vel1, int vel2);
+void	set_vel_2_array(char *message_buffer_tx, int vel1, int vel2);
 
 /**
 Creazione diretta dell'array da inviare al PIC per un comando in posizione

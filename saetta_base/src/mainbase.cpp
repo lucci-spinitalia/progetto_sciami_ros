@@ -57,18 +57,6 @@ void termination_handler(int signum)
  *----------------------------------------------------------------------------*/
 int main(int argc, char** argv)
 {
-  char message_buffer[256];
-  unsigned char message_state = 0;
-  unsigned char bytes_read = 0;
-  
-  int select_result = -1; // value returned frome select()
-  int nfds = 0; // fd to pass to select()
-  fd_set rd, wr, er; // structure for select()
-  struct timeval select_timeout;
-
-  select_timeout.tv_sec = 0;
-  select_timeout.tv_usec = 20000;
-
   // Set up ROS.
   ros::init(argc, argv, "Saetta_Base");
   ros::NodeHandle n("~");
@@ -107,10 +95,6 @@ int main(int argc, char** argv)
   flag = 0;  //verificare se serve
   float* robot_state = (float *) malloc(sizeof (float) *3);
 
-  // set starting speed
-  set_vel_2_array(0.0, 0.0);
-  printf("Velocity set to 0\n");
-
   setup_termination();
 
   // Create PIC thread
@@ -128,88 +112,7 @@ int main(int argc, char** argv)
 
   while(n.ok())
   {
-    FD_ZERO(&rd);
-    FD_ZERO(&wr);
-    FD_ZERO(&er);
-    
-    if(pic_fd > 0)
-    {
-      FD_SET(pic_fd, &rd);
-      nfds = max(nfds, pic_fd);
-      
-      if(rs232_buffer_tx_empty == 0)
-      {
-        FD_SET(pic_fd, &wr);
-        nfds = max(nfds, pic_fd);
-      }
-    }
-    
-    select_result = select(nfds + 1, &rd, &wr, NULL, &select_timeout);
-
-    if(select_result == -1 && errno == EAGAIN)
-    {
-      perror("select");
-      continue;
-    }
-
-    if(select_result == -1)
-    {
-      perror("main:");
-
-      return 1;
-    }
-
-    if(select_result > 0)
-    {
-      if(pic_fd > 0)
-      {
-        if(FD_ISSET(pic_fd, &rd))
-        {
-          bytes_read = rs232_read(pic_fd);
-     
-          if((bytes_read > 0) || ((bytes_read < 0) && rs232_buffer_rx_full))
-          {
-            bytes_read = rs232_unload_rx_filtered(message_buffer, 0x0a);
-
-            if(bytes_read > 0)
-            {
-              message_buffer[bytes_read] = '\0';
-
-              switch(message_state)
-              {
-                case 0:
-                  if(strncmp(message_buffer, "Start", strlen("Start")) == 0)
-                  {
-                    printf("Analizza pacchetto\n");
-                    message_state++;
-                  }
-                  break;
-                  
-                case 1:
-                  int i = 0;
-                  for(i = 0; i < bytes_read; i++)
-                    printf("[%x]", message_buffer[i]);
-                    
-                  printf("\n");
-                  
-                  analizza_pacchetto(pic_buffer, message_buffer, bytes_read);
-
-                  message_state = 0;
-                  break;
-              }
-            }
-          }
-        }
-
-        if(FD_ISSET(pic_fd, &wr))
-        {
-          printf("Write operation!\n");
-          bytes_sent = rs232_write(pic_fd);
-        }
-      }
-    }
-    
-    if((select_timeout.tv_sec == 0) && (select_timeout.tv_usec == 0))
+    if(robot_loop(20000))
     {
       ros::spinOnce();
       set_robot_speed(&(localbase->_linear),&(localbase->_angular));
@@ -222,9 +125,7 @@ int main(int argc, char** argv)
       //the robot states x and y are in [cm], we publish them in [m]
       localbase->set_position(robot_state[0]/100,robot_state[1]/100,robot_state[2]); 
       localbase->publish_odom();
-    
-      select_timeout.tv_sec = 0;
-      select_timeout.tv_usec = 20000;
+
       //r.sleep();
     }
   }

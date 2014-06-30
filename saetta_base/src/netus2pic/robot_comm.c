@@ -1,9 +1,6 @@
 
 #include "robot_comm.h"
-#include <termios.h> //only for tf_pic2netus function
-
-///\brief	pacchetto di ricezione per comunicazione da PIC
-unsigned char* pic_buffer;
+//#include <termios.h> //only for tf_pic2netus function
 
 int init_modulo_comm(char* portname)
 {
@@ -11,8 +8,6 @@ int init_modulo_comm(char* portname)
   
   if(pic_buffer == NULL)
     return 0;
-  
-  set_vel_2_array(10,10);
   
   int i;
   for(i = 0; i < MAX_LEN_PIC_PACKET; i++)
@@ -141,33 +136,33 @@ int get_fine_pacchetto(unsigned char* p){
 
 //------------------------------------------------------------------------------
 
-void set_vel_2_array(int vel1, int vel2)
+void set_vel_2_array(char *buffer_tx, int vel1, int vel2)
 {
 	unsigned int crc;
 	int i;
 	crc=0;	
 	
-  *(pic_buffer) = 0x7F;
+  *(buffer_tx) = 0x7F;
 	
-	*(pic_buffer+1)=(vel1<0);
-	*(pic_buffer+2)=(vel2<0);
+	*(buffer_tx + 1)=(vel1<0);
+	*(buffer_tx + 2)=(vel2<0);
 	
-	*(pic_buffer+3)=(MAX_VEL-abs(vel1))&255;
-	*(pic_buffer+4)=(MAX_VEL-abs(vel1))>>8;
+	*(buffer_tx + 3)=(MAX_VEL-abs(vel1))&255;
+	*(buffer_tx + 4)=(MAX_VEL-abs(vel1))>>8;
 
 	
-	*(pic_buffer+5)=(MAX_VEL-abs(vel2))&255;
-	*(pic_buffer+6)=(MAX_VEL-abs(vel2))>>8;
+	*(buffer_tx + 5)=(MAX_VEL-abs(vel2))&255;
+	*(buffer_tx + 6)=(MAX_VEL-abs(vel2))>>8;
 	
-	*(pic_buffer+7) =!((vel1 == 0) & (vel2 == 0));
+	*(buffer_tx + 7) =!((vel1 == 0) & (vel2 == 0));
 	for(i=0;i<8;i++){
-		crc+=*(pic_buffer+i);
+		crc+=*(buffer_tx + i);
 	}
 	crc=(~crc);
 	crc++;
-	*(pic_buffer+8)=crc&255;	
-	*(pic_buffer+9)=crc>>8;
-	*(pic_buffer+10)=0xa;
+	*(buffer_tx + 8)=crc&255;	
+	*(buffer_tx + 9)=crc>>8;
+	*(buffer_tx + 10)=0xa;
 }
 //------------------------------------------------------------------------------
 
@@ -210,9 +205,9 @@ void set_pos_2_array(unsigned char *p, int vel1, int vel2, int p1, int p2){
 }
 
 /* thread per il PIC */
-void* tf_pic2netus(void *args) 
+/*void* tf_pic2netus(void *args) 
 {
-  unsigned char buf[256];
+  char buf[256];
   int byte_read;
   int an_ret;
   
@@ -269,7 +264,7 @@ void* tf_pic2netus(void *args)
   }
   
   return 0;
-}
+}*/
 
 void close_robot_comm()
 {
@@ -277,10 +272,8 @@ void close_robot_comm()
   tcflush(pic_fd, TCIFLUSH);
   tcflush(pic_fd, TCOFLUSH);	
 
-  set_vel_2_array(0, 0);
-  write(pic_fd, pic_buffer, PACKET_SPEED_LENGTH + 1);
-  sync();
-
+  set_vel_2_array(message_buffer_tx, 0, 0);
+  write(pic_fd, message_buffer_tx, PACKET_SPEED_LENGTH + 1);
   close(pic_fd); // da serial_comm.c
   free(pic_buffer);
 }

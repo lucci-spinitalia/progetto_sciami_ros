@@ -835,7 +835,7 @@ int analizza_pacchetto_init(unsigned char* buffer)
 }
 
 
-int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf, int buffer_size)
+int analizza_pacchetto(char *pic_buffer, char *buf, int buffer_size)
 {
   int message_index = 0;
   int controllo_dati = 1;
