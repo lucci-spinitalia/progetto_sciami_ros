@@ -356,52 +356,51 @@ int decoupled_controller(float *state_r, float *goal_r, float *set_lin_return, f
 // Given the translational and rotational velocities first the two wheels velocities
 // are computed, then the velocities for the pic are derived. The wheels velocities 
 // are represented as cm/sec while the pic velocities are represented as pulse/sec. 
-void set_robot_speed(float *linear_speed, float *angular_speed) {
+void set_robot_speed(float *linear_speed, float *angular_speed) 
+{
+  float linear_speed_limited =* linear_speed;
+  float angular_speed_limited =* angular_speed;
 
-float linear_speed_limited=*linear_speed;
- float angular_speed_limited=*angular_speed;
+  /*Backward differentiation*/
 
-//printf("last_ref: v:[%f], w:[%f]\n", last_v_ref, last_w_ref);
-    /*Backward differentiation*/
+  float back_diff_v_ref = (*linear_speed - last_v_ref) / Hz_4;
+  float back_diff_w_ref = (*angular_speed - last_w_ref) / Hz_4;
 
-    float back_diff_v_ref = (*linear_speed - last_v_ref) / Hz_4;
-    float back_diff_w_ref = (*angular_speed - last_w_ref) / Hz_4;
+  /**************************/
+  /*Saturation*/
+  if(fabs(back_diff_v_ref) > max_lin_acc && fabs(*linear_speed)>fabs(last_v_ref))
+    linear_speed_limited = last_v_ref + (max_lin_acc * Hz_4)*(*linear_speed / fabs(*linear_speed));
+    
+  if (fabs(back_diff_w_ref) > max_ang_acc && fabs(*angular_speed)>fabs(last_w_ref))
+    angular_speed_limited= last_w_ref + (max_ang_acc * Hz_4)*(*angular_speed / fabs(*angular_speed));
 
-    /**************************/
-//printf("speed BEFORE SATURATION - linear: %f  \t angular: %f\n",*linear_speed, *angular_speed);
-    /*Saturation*/
-    if (fabs(back_diff_v_ref) > max_lin_acc && fabs(*linear_speed)>fabs(last_v_ref))
-        linear_speed_limited = last_v_ref + (max_lin_acc * Hz_4)*(*linear_speed / fabs(*linear_speed));
-    if (fabs(back_diff_w_ref) > max_ang_acc && fabs(*angular_speed)>fabs(last_w_ref))
-       angular_speed_limited= last_w_ref + (max_ang_acc * Hz_4)*(*angular_speed / fabs(*angular_speed));
+  /************/
 
-    /************/
-
-    /*From linear and angular speed to each engine velocity*/
-   //printf("saturated speed -> linear: %f  \t angular: %f\n", linear_speed_limited , angular_speed_limited);
+  /*From linear and angular speed to each engine velocity*/ 
 	get_vel_motori_constant_ratio(&linear_speed_limited,&angular_speed_limited, &v_m1, &v_m2);
-    /*Getting the number of pulses*/
-    calcola_velocita(v_m1, TRISTEPPING, &pulse_m1);
-    calcola_velocita(v_m2, TRISTEPPING, &pulse_m2);
-	//printf("vm1: %f ---- vm2: %f\n",v_m1, v_m2);
+    
+  /*Getting the number of pulses*/
+  calcola_velocita(v_m1, TRISTEPPING, &pulse_m1);
+  calcola_velocita(v_m2, TRISTEPPING, &pulse_m2);
 
-    /*Pulses Saturation*/
-    if(pulse_m1 != 0)
-    {
-    	pulse_m1 = (int)fmin(fmax(-900.0, (double)pulse_m1), 900.0);
-        pulse_m1 = pulse_m1 / abs(pulse_m1)*(1024 - abs(pulse_m1));
-
-    }
-    if(pulse_m2 != 0)
-    {
-	pulse_m2 = (int)fmin(fmax(-900.0, (double)pulse_m2), 900.0);
-        pulse_m2 = pulse_m2 / abs(pulse_m2)*(1024 - abs(pulse_m2));
-    }
-    /*Writing onto the pic serial buffer*/
-    set_vel_2_array(pulse_m1, pulse_m2);
+  /*Pulses Saturation*/
+  if(pulse_m1 != 0)
+  {
+  	pulse_m1 = (int)fmin(fmax(-900.0, (double)pulse_m1), 900.0);
+    pulse_m1 = pulse_m1 / abs(pulse_m1)*(1024 - abs(pulse_m1));
+  }
+  
+  if(pulse_m2 != 0)
+  {
+	  pulse_m2 = (int)fmin(fmax(-900.0, (double)pulse_m2), 900.0);
+    pulse_m2 = pulse_m2 / abs(pulse_m2)*(1024 - abs(pulse_m2));
+  }
+  
+  /*Writing onto the pic serial buffer*/
+  set_vel_2_array(pulse_m1, pulse_m2);
 	// Save the latest translational and rotational velocities
-    last_v_ref = linear_speed_limited;
-    last_w_ref =  angular_speed_limited;
+  last_v_ref = linear_speed_limited;
+  last_w_ref =  angular_speed_limited;
 }
 
 //------------------------------------------------------------------------------

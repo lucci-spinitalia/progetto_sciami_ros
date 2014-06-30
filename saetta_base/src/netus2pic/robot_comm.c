@@ -236,16 +236,16 @@ void* tf_pic2netus(void *args)
     do 
     {
       read(pic_fd, buf, 1);        
-    } while(buf[0]!='S');
+    }while(buf[0] != 'S');
         
     byte_read++;
 
     // Get the whole pkg    
     do 
     {
-      read(pic_fd,buf+byte_read,1);
+      read(pic_fd, buf + byte_read, 1);
       byte_read++;      
-    } while(*(buf+byte_read-1)!='\n');
+    } while(*(buf + byte_read - 1) != '\n');
 
     analizza_pacchetto(pic_buffer, buf, byte_read);
 

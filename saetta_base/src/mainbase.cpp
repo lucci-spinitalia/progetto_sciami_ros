@@ -20,6 +20,7 @@
  * LOAD_PACKET_ANALYZED = 2
  */
 #include <signal.h>
+#include <string.h>
 #include "Saetta_Base.h"
 #include "Rs232/rs232.h"
 
@@ -56,7 +57,8 @@ void termination_handler(int signum)
  *----------------------------------------------------------------------------*/
 int main(int argc, char** argv)
 {
-  unsigned char message_buffer[256];
+  char message_buffer[256];
+  unsigned char message_state = 0;
   unsigned char bytes_read = 0;
   
   int select_result = -1; // value returned frome select()
@@ -112,13 +114,13 @@ int main(int argc, char** argv)
   setup_termination();
 
   // Create PIC thread
-  if(pthread_create(&thread_pic, NULL, &tf_pic2netus, NULL)!= 0) 
+  /*if(pthread_create(&thread_pic, NULL, &tf_pic2netus, NULL)!= 0) 
   {
     perror("Error creating PIC thread.\n");
     return 1;
   }
 
-  /*printf("Thread created. Waiting for mutex. . .");
+  printf("Thread created. Waiting for mutex. . .");
   fflush(stdout);
   pthread_cond_wait(&cond, &tmutex);
   pthread_mutex_unlock(&tmutex);
@@ -168,19 +170,37 @@ int main(int argc, char** argv)
           if((bytes_read > 0) || ((bytes_read < 0) && rs232_buffer_rx_full))
           {
             bytes_read = rs232_unload_rx_filtered(message_buffer, 0x0a);
-            
+
             if(bytes_read > 0)
             {
-              message_buffer[bytes_read] = '\n';
-              message_buffer[bytes_read + 1] = '\0';
-              printf("%s", message_buffer);
+              message_buffer[bytes_read] = '\0';
+
+              switch(message_state)
+              {
+                case 0:
+                  if(strncmp(message_buffer, "Start", strlen("Start")) == 0)
+                  {
+                    printf("Analizza pacchetto\n");
+                    message_state++;
+                  }
+                  break;
+                  
+                case 1:
+                  int i = 0;
+                  for(i = 0; i < bytes_read; i++)
+                    printf("[%x]", message_buffer[i]);
+                    
+                  printf("\n");
+                  message_state = 0;
+                  break;
+              }
             }
           }
         }
-        
+
         if(FD_ISSET(pic_fd, &wr))
         {
-        
+          bytes_sent = rs232_write(pic_fd);
         }
       }
     }
