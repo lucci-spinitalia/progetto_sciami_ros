@@ -157,7 +157,7 @@ int 	genera_pacchetto_sensore_standard(unsigned char *pacchetto, struct sensore_
 Processing di uno stream di dati in input: STA PER SOSTITUIRE processa_pacchetto();
 \brief	processing del pacchetto: IN PROCESSING
 */
-int	analizza_pacchetto_init(unsigned char* buffer);
+int	analizza_pacchetto_init(unsigned char* buffer, int message_size);
 int analizza_pacchetto(char *pic_buffer, char *buf, int len);
 #ifdef __cplusplus
 }

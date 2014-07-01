@@ -23,113 +23,111 @@ void init_sensors()
 
 
 //----------------------------------------------------------------------
-void init_sensore(sensore* s, int numero_sensori){
-	*s=malloc(sizeof(struct sensore_t));
-	(*s)->num_canali=numero_sensori;
-	(*s)->range=malloc(numero_sensori*sizeof(unsigned int));
-	(*s)->bias=malloc(numero_sensori*sizeof(unsigned int));
-	(*s)->converted=malloc(numero_sensori*sizeof(int));
+void init_sensore(sensore* s, int numero_sensori)
+{
+	*s = malloc(sizeof(struct sensore_t));
+	(*s)->num_canali = numero_sensori;
+	(*s)->range = malloc(numero_sensori*sizeof(unsigned int));
+	(*s)->bias = malloc(numero_sensori*sizeof(unsigned int));
+	(*s)->converted = malloc(numero_sensori*sizeof(int));
 }
 //----------------------------------------------------------------------
 
 //=========================================================================================================
 
-inline void gyro_zero_setting(unsigned char *pic_buffer) {
-
-    int local_counter = 0;
-    int local_value = 0;
-    while (local_counter < 3000) {
-	pthread_mutex_lock(&m_analizza_pacchetto);
-	while (!flag) {
-	    pthread_cond_wait(&cv_analizza_pacchetto, &m_analizza_pacchetto);
-	}
-	pthread_mutex_unlock(&m_analizza_pacchetto);
-	packet_type = analizza_pacchetto_init(pic_buffer);
-	if (gyro->is_valid == TRUE) {
-	    if (local_value == *(gyro->range + 1)) {
-		local_counter++;
-		printf("lv: %d\n", local_value);
-	    } else {
-		local_counter = 0;
-		local_value = *(gyro->range + 1);
+inline void gyro_zero_setting(unsigned char *pic_buffer, int buffer_size) 
+{
+  int local_counter = 0;
+  int local_value = 0;
+  
+  while (local_counter < 3000) 
+  {   
+	  packet_type = analizza_pacchetto_init(pic_buffer, buffer_size);
+    
+	  if (gyro->is_valid == TRUE) 
+    {
+	    if (local_value == *(gyro->range + 1)) 
+      {
+		    local_counter++;
+		    printf("lv: %d\n", local_value);
+	    } 
+      else 
+      {
+		    local_counter = 0;
+		    local_value = *(gyro->range + 1);
 	    }
-	    if (local_counter > 10) {
-		gyro_table_effective_zero = local_value;
-		local_counter = 3001;
+      
+	    if(local_counter > 10) 
+      {
+		    gyro_table_effective_zero = local_value;
+		    local_counter = 3001;
 	    }
-	}
-    }
-    printf("zero_trovato= %d su %d iterazioni\n", gyro_table_effective_zero, local_counter);
+	  }
+  }
+  
+  printf("zero_trovato= %d su %d iterazioni\n", gyro_table_effective_zero, local_counter);
 }
 //=========================================================================================================
 
 
 //=========================================================================================================
 
-inline void calibrazione_magneto(unsigned char *pic_buffer) {
+inline void calibrazione_magneto(unsigned char *pic_buffer, int buffer_size) 
+{
+  int magneto_flag = 0;
+  int v1,v2;
+  
+  velocita = 2.0;
+  angle_degrees = 360.0;
+  angle_rad = M_PI * angle_degrees / 180.0;
+  calcola_angolo(angle_rad, velocita, &v1, &v2, &num_passi);
+  v1 = v1 / modulo(v1)*(1024 - modulo(v1));
+  v2 = v2 / modulo(v2)*(1024 - modulo(v2));
+  set_pos_2_array(pic_buffer[0], v1, v2, num_passi, num_passi);
 
-    int magneto_flag = 0;
-    int v1,v2;
-    velocita = 2.0;
-    angle_degrees = 360.0;
-    angle_rad = M_PI * angle_degrees / 180.0;
-    fpm_log = fopen(MAGNETO_LOG, "w");
-    calcola_angolo(angle_rad, velocita, &v1, &v2, &num_passi);
-    v1 = v1 / modulo(v1)*(1024 - modulo(v1));
-    v2 = v2 / modulo(v2)*(1024 - modulo(v2));
-    set_pos_2_array(pic_buffer[0], v1, v2, num_passi, num_passi);
-
-    while (flag_servoing_completed != 1) {
-	pthread_mutex_lock(&m_analizza_pacchetto);
-	while (!flag) {
-	    pthread_cond_wait(&cv_analizza_pacchetto, &m_analizza_pacchetto);
-	}
-	pthread_mutex_unlock(&m_analizza_pacchetto);
-	packet_type = analizza_pacchetto_init(pic_buffer);
-	if (magneto->is_valid == TRUE) {
-	    print_sensore_on_file(magneto, fpm_log);
-	    fprintf(fpm_log, "\n");
-	}
-    }
-    fclose(fpm_log);
+  while (flag_servoing_completed != 1) 
+  {
+	  packet_type = analizza_pacchetto_init(pic_buffer, buffer_size);
+  }
 }
 //=========================================================================================================
 
 
 //=========================================================================================================
 
-inline void magneto_zero_setting(unsigned char *pic_buffer) {
+inline void magneto_zero_setting(unsigned char *pic_buffer, int buffer_size) 
+{
+  int local_counter = 0;
+  int local_value = 0;
+  int x = 0;
+  int y = 0;
 
-    int local_counter = 0;
-    int local_value = 0;
-    int x = 0;
-    int y = 0;
-    while (local_counter < 16) {
-	pthread_mutex_lock(&m_analizza_pacchetto);
-	while (!flag) {
-	    pthread_cond_wait(&cv_analizza_pacchetto, &m_analizza_pacchetto);
-	}
-	pthread_mutex_unlock(&m_analizza_pacchetto);
-	packet_type = analizza_pacchetto_init(pic_buffer);
-	if (magneto->is_valid == TRUE) {
+  while (local_counter < 16) 
+  {
+	  packet_type = analizza_pacchetto_init(pic_buffer, buffer_size);
+    
+	  if(magneto->is_valid == TRUE) 
+    {
 	    x += *(magneto->range);
 	    y += *(magneto->range + 1);
 	    ++local_counter;
-	}
-    }
-    x = x >> 4;
-    y = y >> 4;
+	  }
+  }
+  
+  x = x >> 4;
+  y = y >> 4;
 
-    pMag->nordRad = pMag->tabMag[(x - pMag->tozerox)*(pMag->colonneTabMag)+(y - pMag->tozeroy)];
-    printf("Gradi inziali:%d %d %f\n", x, y, pMag->nordRad);
+  pMag->nordRad = pMag->tabMag[(x - pMag->tozerox)*(pMag->colonneTabMag)+(y - pMag->tozeroy)];
+  printf("Gradi inziali:%d %d %f\n", x, y, pMag->nordRad);
 }
 //=========================================================================================================
 
 //------------------------------------------------------------------------------
-void print_sensore(sensore s){
-
+void print_sensore(sensore s)
+{
 	int i;
-	for(i=0;i<s->num_canali;i++){
+	for(i=0;i<s->num_canali;i++)
+  {
 		//printf("%4u ", ir_distance[1023-*(s->range+i)]);
 		printf("%4u ", *(s->range+i));
 		//printf("b %4u ", *(s->bias+i));
@@ -144,14 +142,13 @@ void 	print_sensore_on_file(sensore s, FILE* paux){
 
 	int i;
 	//	carattere tab
-        if (paux != NULL) {
-            fprintf(paux, "%c", 0x09);	
-            for(i=0;i<s->num_canali;i++){
-                    //printf("%4u ", ir_distance[1023-*(s->range+i)]);
-                    fprintf(paux, "%4u ", *(s->range+i));
-            }
-        }
-	//fprintf(paux, "\n", *(s->range+i));
+  if (paux != NULL) 
+  {
+    fprintf(paux, "%c", 0x09);	
+     
+    for(i=0;i<s->num_canali;i++)
+      fprintf(paux, "%4u ", *(s->range+i));
+  }
 }
 //------------------------------------------------------------------------------
 
@@ -327,8 +324,6 @@ void create_magneto_table(){
                     fattnormx	=	maxx-offsetx;
                     fattnormy	=	maxy-offsety;
 
-                    //printf("OFFSETS: %f %f\n", offsetx, offsety);
-                    //printf("FATTNORM: %f %f\n", fattnormx, fattnormy);
                     fprintf(fpm_table,"%d %d %d %d\n",minx,maxx,miny,maxy);
                     for(i=-fattnormx;i<=fattnormx;i++) {
                             for(j=-fattnormy;j<=fattnormy;j++) {
@@ -398,10 +393,6 @@ int magneto_table_2_struct(structMag **im) {
 
 void close_sensors()
 {
-    pthread_mutex_destroy(&mutex_ir);
-    pthread_mutex_destroy(&mutex_gyro);
-    pthread_mutex_destroy(&mutex_acc);
-    pthread_mutex_destroy(&mutex_magneto);
     
 }
 

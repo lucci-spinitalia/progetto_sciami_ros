@@ -47,7 +47,6 @@ FILE* fpm_log;
 FILE* fpm_table;
 
 ///\brief filename of the magneto self-rotation
-//#define MAGNETO_LOG "/home/panda/.ros/saetta_base/magneto_rot.txt"
 #define MAGNETO_LOG "log_files/magneto_rot.txt"
 
 ///\brief filename of the magneto self-rotation
@@ -75,20 +74,12 @@ int flag_servoing_completed = 0;
 
 ///\brief	puntatore a sensore gyro
 sensore 	gyro;			//	gyro sensor
-///\brief	mutex sensore gyro
-pthread_mutex_t mutex_gyro;		//	gyro sensor
 ///\brief	puntatore a sensore ir
 sensore	  		ir;			//	ir sensor
-///\brief	mutex sensore ir
-pthread_mutex_t mutex_ir;		//	gyro sensor
 ///\brief	puntatore a sensore acc
 sensore  		acc;		//	acc sensor
-///\brief	mutex sensore acc
-pthread_mutex_t mutex_acc;		//	gyro sensor
 ///\brief	puntatore a sensore magneto
 sensore 		magneto;	//	magneto sensor
-///\brief	puntatore a sensore magneto
-pthread_mutex_t mutex_magneto;	//	magneto sensor
 
 ///\brief	inizializzazione della parte sensoriale
 void init_sensors();
@@ -157,15 +148,15 @@ int creaTabellaMagneto(structMag **im);
 /**
 *TODO
 */
-inline void gyro_zero_setting(unsigned char *pic_buffer);
+inline void gyro_zero_setting(unsigned char *pic_buffer, int buffer_size);
 /**
 *TODO
 */
-inline void calibrazione_magneto(unsigned char *pic_buffer);
+inline void calibrazione_magneto(unsigned char *pic_buffer, int buffer_size);
 /**
 *TODO
 */
-inline void magneto_zero_setting(unsigned char *pic_buffer);
+inline void magneto_zero_setting(unsigned char *pic_buffer, int buffer_size);
 
 void close_sensors();
 #ifdef __cplusplus
