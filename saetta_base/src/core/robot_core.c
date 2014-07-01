@@ -1,4 +1,5 @@
 #include "robot_core.h"
+#include <errno.h>
 
 char message_buffer_tx[256];
 char message_buffer_rx[256];
@@ -435,10 +436,16 @@ void get_robot_state(float **robot_state) {
 
 //------------------------------------------------------------------------------
 
-void close_robot() {
-    pthread_mutex_destroy(&mutex_fp);
-    pthread_mutex_destroy(&mutex_state);
-    close_sensors();
+void close_robot() 
+{
+  pthread_mutex_destroy(&mutex_fp);
+  pthread_mutex_destroy(&mutex_state);
+    
+  set_vel_2_array(message_buffer_tx, 0, 0);
+  write(pic_fd, message_buffer_tx, PACKET_SPEED_LENGTH + 1);
+  close_sensors();
+  
+  close_robot_comm();
 }
 
 
@@ -543,19 +550,10 @@ int robot_loop(int time_us)
             {
               case 0:
                 if(strncmp(message_buffer_rx, "START", strlen("START")) == 0)
-                {
-                  printf("Analizza pacchetto\n");
                   message_state++;
-                }
                 break;
                   
               case 1:
-                int i = 0;
-                for(i = 0; i < bytes_read; i++)
-                  printf("[%x]", message_buffer_rx[i]);
-                    
-                printf("\n");
-                  
                 analizza_pacchetto(message_buffer_tx, message_buffer_rx, bytes_read);
 
                 message_state = 0;
@@ -567,7 +565,6 @@ int robot_loop(int time_us)
 
       if(FD_ISSET(pic_fd, &wr))
       {
-        printf("Write operation!\n");
         bytes_sent = rs232_write(pic_fd);
       }
     }

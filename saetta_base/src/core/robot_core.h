@@ -101,6 +101,10 @@ int segno[2] = {1, -1}; //	aux
 //		Functions declaration
 ///\brief	inizializzazione del modulo robot
 int init_robot(char* portname);
+
+///\brief	loop principale del robot
+int robot_loop(int time_us);
+
 ///\brief	chiusura del modulo robot
 void close_robot();
 //					OPERAZIONI DI CONTROLLO

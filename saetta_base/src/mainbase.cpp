@@ -47,7 +47,7 @@ void termination_handler(int signum)
   //pthread_mutex_destroy(&tmutex);  
   //pthread_cancel(thread_pic);
 
-  close_robot_comm();
+  close_robot();
   exit(0);
 }
 

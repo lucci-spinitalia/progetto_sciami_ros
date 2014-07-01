@@ -269,11 +269,9 @@ void set_pos_2_array(unsigned char *p, int vel1, int vel2, int p1, int p2){
 void close_robot_comm()
 {
   // Clean the buffer	
-  tcflush(pic_fd, TCIFLUSH);
-  tcflush(pic_fd, TCOFLUSH);	
+  //tcflush(pic_fd, TCIFLUSH);
+  //tcflush(pic_fd, TCOFLUSH);	
 
-  set_vel_2_array(message_buffer_tx, 0, 0);
-  write(pic_fd, message_buffer_tx, PACKET_SPEED_LENGTH + 1);
   close(pic_fd); // da serial_comm.c
   free(pic_buffer);
 }
