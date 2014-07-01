@@ -9,17 +9,11 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <pthread.h>
 #include "../Rs232/rs232.h"
 #include "pic2netus.h"
 
 
 //							COSTANTI
-
-pthread_cond_t cv_analizza_pacchetto;
-
-pthread_mutex_t m_io;	
-
 #define 		FALSE 				0
 #define 		TRUE 				1
 
@@ -197,7 +191,6 @@ CARATTERE_SOGLIA e CARATTERE+CARATTERE_SOGLIA
 */
 int 	check_soglia(unsigned char* pac);	
 
-void* tf_pic2netus(void *args);
 #ifdef __cplusplus
 }
 #endif

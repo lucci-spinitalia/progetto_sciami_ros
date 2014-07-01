@@ -393,7 +393,6 @@ int magneto_table_2_struct(structMag **im) {
 
 void close_sensors()
 {
-    
 }
 
 

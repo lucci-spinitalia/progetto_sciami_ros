@@ -400,12 +400,11 @@ int analizza_pacchetto_init(unsigned char* buffer, int message_size)
   int message_index = 0;
   int controllo_dati = 1;
   unsigned int code;
-  unsigned int i;
 	
   unsigned char pic_message_buffer[256];
 
   if(sizeof(pic_message_buffer) >= message_size)
-    memcpy(pic_message_buffer, buf, message_size);
+    memcpy(pic_message_buffer, buffer, message_size);
   else
   {
     // cannot use temp buffer

@@ -513,9 +513,15 @@ int robot_loop(int time_us)
 
 void close_robot() 
 {
+  printf("Closing. . . \n");
+  printf("Setting velocity to zero. . .\n");
+  
   set_vel_2_array(message_buffer_tx, 0, 0);
   write(tty_fd, message_buffer_tx, PACKET_SPEED_LENGTH + 1);
+  
+  printf("Terminating sensors. . .\n");
   close_sensors();
 
+  printf("Closing tty. . .\n");
   close(tty_fd);
 }

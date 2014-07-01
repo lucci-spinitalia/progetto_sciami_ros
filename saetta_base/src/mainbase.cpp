@@ -12,7 +12,8 @@
 
 using namespace std;
 
-
+float* robot_state;
+  
 void setup_termination();
 void termination_handler(int signum);
 
@@ -27,6 +28,10 @@ void setup_termination()
 void termination_handler(int signum) 
 {
   close_robot();
+
+  if(robot_state > 0)
+    free(robot_state);
+    
   exit(0);
 }
 
@@ -36,6 +41,8 @@ void termination_handler(int signum)
  *----------------------------------------------------------------------------*/
 int main(int argc, char** argv)
 {
+  robot_state = (float *) malloc(sizeof (float) *3);
+
   // Set up ROS.
   ros::init(argc, argv, "Saetta_Base");
   ros::NodeHandle n("~");
@@ -66,8 +73,6 @@ int main(int argc, char** argv)
 
   delete[] nPort_char; //free memory
 
-  float* robot_state = (float *) malloc(sizeof (float) *3);
-
   setup_termination();
 
   while(n.ok())
@@ -84,6 +89,6 @@ int main(int argc, char** argv)
       localbase->publish_odom();
     }
   }
-
+  
   return (EXIT_SUCCESS);
 }
