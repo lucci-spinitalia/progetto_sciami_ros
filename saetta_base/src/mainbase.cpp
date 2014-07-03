@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   ros::Subscriber sub = n.subscribe("/saetta/velocity", 10, &Saetta_Base::listenerCallback, localbase);
 
   int period_us;
-  n.param<int>("period", period_us, "20000");
+  n.param<int>("period", period_us, 20000);
   ROS_INFO_STREAM("ROS publish refresh: " << period_us << " us");
 
   std::string nPort; //default port name
