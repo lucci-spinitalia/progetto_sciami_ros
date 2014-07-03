@@ -35,14 +35,17 @@ CMAKE_COMMAND = /usr/bin/cmake
 # The command to remove a file.
 RM = /usr/bin/cmake -E remove -f
 
+# Escaping for special characters.
+EQUALS = =
+
 # The program to use to edit the cache.
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/panda/ROS_WORKSPACE/saetta/saetta_base
+CMAKE_SOURCE_DIR = /home/pi/catkin_ws/src/saetta_base
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/panda/ROS_WORKSPACE/saetta/saetta_base/build
+CMAKE_BINARY_DIR = /home/pi/catkin_ws/src/saetta_base/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -57,6 +60,47 @@ edit_cache:
 edit_cache/fast: edit_cache
 .PHONY : edit_cache/fast
 
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: install/local
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: install/strip
+.PHONY : install/strip/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -69,9 +113,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/panda/ROS_WORKSPACE/saetta/saetta_base/build/CMakeFiles /home/panda/ROS_WORKSPACE/saetta/saetta_base/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/catkin_ws/src/saetta_base/build/CMakeFiles /home/pi/catkin_ws/src/saetta_base/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/panda/ROS_WORKSPACE/saetta/saetta_base/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/catkin_ws/src/saetta_base/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -112,19 +156,6 @@ ROSBUILD_genmsg_cpp/fast:
 .PHONY : ROSBUILD_genmsg_cpp/fast
 
 #=============================================================================
-# Target rules for targets named ROSBUILD_genmsg_lisp
-
-# Build rule for target.
-ROSBUILD_genmsg_lisp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_genmsg_lisp
-.PHONY : ROSBUILD_genmsg_lisp
-
-# fast build rule for target.
-ROSBUILD_genmsg_lisp/fast:
-	$(MAKE) -f CMakeFiles/ROSBUILD_genmsg_lisp.dir/build.make CMakeFiles/ROSBUILD_genmsg_lisp.dir/build
-.PHONY : ROSBUILD_genmsg_lisp/fast
-
-#=============================================================================
 # Target rules for targets named ROSBUILD_gensrv_cpp
 
 # Build rule for target.
@@ -138,17 +169,17 @@ ROSBUILD_gensrv_cpp/fast:
 .PHONY : ROSBUILD_gensrv_cpp/fast
 
 #=============================================================================
-# Target rules for targets named ROSBUILD_gensrv_lisp
+# Target rules for targets named _catkin_empty_exported_target
 
 # Build rule for target.
-ROSBUILD_gensrv_lisp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_gensrv_lisp
-.PHONY : ROSBUILD_gensrv_lisp
+_catkin_empty_exported_target: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _catkin_empty_exported_target
+.PHONY : _catkin_empty_exported_target
 
 # fast build rule for target.
-ROSBUILD_gensrv_lisp/fast:
-	$(MAKE) -f CMakeFiles/ROSBUILD_gensrv_lisp.dir/build.make CMakeFiles/ROSBUILD_gensrv_lisp.dir/build
-.PHONY : ROSBUILD_gensrv_lisp/fast
+_catkin_empty_exported_target/fast:
+	$(MAKE) -f CMakeFiles/_catkin_empty_exported_target.dir/build.make CMakeFiles/_catkin_empty_exported_target.dir/build
+.PHONY : _catkin_empty_exported_target/fast
 
 #=============================================================================
 # Target rules for targets named ausiliarie
@@ -177,17 +208,17 @@ base/fast:
 .PHONY : base/fast
 
 #=============================================================================
-# Target rules for targets named clean-test-results
+# Target rules for targets named clean_test_results
 
 # Build rule for target.
-clean-test-results: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 clean-test-results
-.PHONY : clean-test-results
+clean_test_results: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 clean_test_results
+.PHONY : clean_test_results
 
 # fast build rule for target.
-clean-test-results/fast:
-	$(MAKE) -f CMakeFiles/clean-test-results.dir/build.make CMakeFiles/clean-test-results.dir/build
-.PHONY : clean-test-results/fast
+clean_test_results/fast:
+	$(MAKE) -f CMakeFiles/clean_test_results.dir/build.make CMakeFiles/clean_test_results.dir/build
+.PHONY : clean_test_results/fast
 
 #=============================================================================
 # Target rules for targets named core
@@ -203,17 +234,17 @@ core/fast:
 .PHONY : core/fast
 
 #=============================================================================
-# Target rules for targets named joystick
+# Target rules for targets named doxygen
 
 # Build rule for target.
-joystick: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 joystick
-.PHONY : joystick
+doxygen: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 doxygen
+.PHONY : doxygen
 
 # fast build rule for target.
-joystick/fast:
-	$(MAKE) -f CMakeFiles/joystick.dir/build.make CMakeFiles/joystick.dir/build
-.PHONY : joystick/fast
+doxygen/fast:
+	$(MAKE) -f CMakeFiles/doxygen.dir/build.make CMakeFiles/doxygen.dir/build
+.PHONY : doxygen/fast
 
 #=============================================================================
 # Target rules for targets named pic2netus
@@ -266,6 +297,19 @@ robotcore: cmake_check_build_system
 robotcore/fast:
 	$(MAKE) -f CMakeFiles/robotcore.dir/build.make CMakeFiles/robotcore.dir/build
 .PHONY : robotcore/fast
+
+#=============================================================================
+# Target rules for targets named rosbuild_clean-test-results
+
+# Build rule for target.
+rosbuild_clean-test-results: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rosbuild_clean-test-results
+.PHONY : rosbuild_clean-test-results
+
+# fast build rule for target.
+rosbuild_clean-test-results/fast:
+	$(MAKE) -f CMakeFiles/rosbuild_clean-test-results.dir/build.make CMakeFiles/rosbuild_clean-test-results.dir/build
+.PHONY : rosbuild_clean-test-results/fast
 
 #=============================================================================
 # Target rules for targets named rosbuild_precompile
@@ -333,30 +377,30 @@ rospack_gensrv/fast:
 .PHONY : rospack_gensrv/fast
 
 #=============================================================================
-# Target rules for targets named serial_comm
+# Target rules for targets named rs232
 
 # Build rule for target.
-serial_comm: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 serial_comm
-.PHONY : serial_comm
+rs232: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rs232
+.PHONY : rs232
 
 # fast build rule for target.
-serial_comm/fast:
-	$(MAKE) -f CMakeFiles/serial_comm.dir/build.make CMakeFiles/serial_comm.dir/build
-.PHONY : serial_comm/fast
+rs232/fast:
+	$(MAKE) -f CMakeFiles/rs232.dir/build.make CMakeFiles/rs232.dir/build
+.PHONY : rs232/fast
 
 #=============================================================================
-# Target rules for targets named teleop_saetta
+# Target rules for targets named run_tests
 
 # Build rule for target.
-teleop_saetta: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 teleop_saetta
-.PHONY : teleop_saetta
+run_tests: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 run_tests
+.PHONY : run_tests
 
 # fast build rule for target.
-teleop_saetta/fast:
-	$(MAKE) -f CMakeFiles/teleop_saetta.dir/build.make CMakeFiles/teleop_saetta.dir/build
-.PHONY : teleop_saetta/fast
+run_tests/fast:
+	$(MAKE) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/build
+.PHONY : run_tests/fast
 
 #=============================================================================
 # Target rules for targets named test
@@ -423,155 +467,223 @@ tests/fast:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/build
 .PHONY : tests/fast
 
+#=============================================================================
+# Target rules for targets named gtest
+
+# Build rule for target.
+gtest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gtest
+.PHONY : gtest
+
+# fast build rule for target.
+gtest/fast:
+	$(MAKE) -f gtest/CMakeFiles/gtest.dir/build.make gtest/CMakeFiles/gtest.dir/build
+.PHONY : gtest/fast
+
+#=============================================================================
+# Target rules for targets named gtest_main
+
+# Build rule for target.
+gtest_main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gtest_main
+.PHONY : gtest_main
+
+# fast build rule for target.
+gtest_main/fast:
+	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/build
+.PHONY : gtest_main/fast
+
+src/Rs232/rs232.o: src/Rs232/rs232.c.o
+.PHONY : src/Rs232/rs232.o
+
 # target to build an object file
-src/Saetta_Base_core.o:
-	$(MAKE) -f CMakeFiles/core.dir/build.make CMakeFiles/core.dir/src/Saetta_Base_core.o
+src/Rs232/rs232.c.o:
+	$(MAKE) -f CMakeFiles/rs232.dir/build.make CMakeFiles/rs232.dir/src/Rs232/rs232.c.o
+.PHONY : src/Rs232/rs232.c.o
+
+src/Rs232/rs232.i: src/Rs232/rs232.c.i
+.PHONY : src/Rs232/rs232.i
+
+# target to preprocess a source file
+src/Rs232/rs232.c.i:
+	$(MAKE) -f CMakeFiles/rs232.dir/build.make CMakeFiles/rs232.dir/src/Rs232/rs232.c.i
+.PHONY : src/Rs232/rs232.c.i
+
+src/Rs232/rs232.s: src/Rs232/rs232.c.s
+.PHONY : src/Rs232/rs232.s
+
+# target to generate assembly for a file
+src/Rs232/rs232.c.s:
+	$(MAKE) -f CMakeFiles/rs232.dir/build.make CMakeFiles/rs232.dir/src/Rs232/rs232.c.s
+.PHONY : src/Rs232/rs232.c.s
+
+src/Saetta_Base_core.o: src/Saetta_Base_core.cpp.o
 .PHONY : src/Saetta_Base_core.o
 
-# target to preprocess a source file
-src/Saetta_Base_core.i:
-	$(MAKE) -f CMakeFiles/core.dir/build.make CMakeFiles/core.dir/src/Saetta_Base_core.i
+# target to build an object file
+src/Saetta_Base_core.cpp.o:
+	$(MAKE) -f CMakeFiles/core.dir/build.make CMakeFiles/core.dir/src/Saetta_Base_core.cpp.o
+.PHONY : src/Saetta_Base_core.cpp.o
+
+src/Saetta_Base_core.i: src/Saetta_Base_core.cpp.i
 .PHONY : src/Saetta_Base_core.i
 
-# target to generate assembly for a file
-src/Saetta_Base_core.s:
-	$(MAKE) -f CMakeFiles/core.dir/build.make CMakeFiles/core.dir/src/Saetta_Base_core.s
+# target to preprocess a source file
+src/Saetta_Base_core.cpp.i:
+	$(MAKE) -f CMakeFiles/core.dir/build.make CMakeFiles/core.dir/src/Saetta_Base_core.cpp.i
+.PHONY : src/Saetta_Base_core.cpp.i
+
+src/Saetta_Base_core.s: src/Saetta_Base_core.cpp.s
 .PHONY : src/Saetta_Base_core.s
 
-# target to build an object file
-src/ausiliarie/funzioni_ausiliarie.o:
-	$(MAKE) -f CMakeFiles/ausiliarie.dir/build.make CMakeFiles/ausiliarie.dir/src/ausiliarie/funzioni_ausiliarie.o
+# target to generate assembly for a file
+src/Saetta_Base_core.cpp.s:
+	$(MAKE) -f CMakeFiles/core.dir/build.make CMakeFiles/core.dir/src/Saetta_Base_core.cpp.s
+.PHONY : src/Saetta_Base_core.cpp.s
+
+src/ausiliarie/funzioni_ausiliarie.o: src/ausiliarie/funzioni_ausiliarie.c.o
 .PHONY : src/ausiliarie/funzioni_ausiliarie.o
 
-# target to preprocess a source file
-src/ausiliarie/funzioni_ausiliarie.i:
-	$(MAKE) -f CMakeFiles/ausiliarie.dir/build.make CMakeFiles/ausiliarie.dir/src/ausiliarie/funzioni_ausiliarie.i
+# target to build an object file
+src/ausiliarie/funzioni_ausiliarie.c.o:
+	$(MAKE) -f CMakeFiles/ausiliarie.dir/build.make CMakeFiles/ausiliarie.dir/src/ausiliarie/funzioni_ausiliarie.c.o
+.PHONY : src/ausiliarie/funzioni_ausiliarie.c.o
+
+src/ausiliarie/funzioni_ausiliarie.i: src/ausiliarie/funzioni_ausiliarie.c.i
 .PHONY : src/ausiliarie/funzioni_ausiliarie.i
 
-# target to generate assembly for a file
-src/ausiliarie/funzioni_ausiliarie.s:
-	$(MAKE) -f CMakeFiles/ausiliarie.dir/build.make CMakeFiles/ausiliarie.dir/src/ausiliarie/funzioni_ausiliarie.s
+# target to preprocess a source file
+src/ausiliarie/funzioni_ausiliarie.c.i:
+	$(MAKE) -f CMakeFiles/ausiliarie.dir/build.make CMakeFiles/ausiliarie.dir/src/ausiliarie/funzioni_ausiliarie.c.i
+.PHONY : src/ausiliarie/funzioni_ausiliarie.c.i
+
+src/ausiliarie/funzioni_ausiliarie.s: src/ausiliarie/funzioni_ausiliarie.c.s
 .PHONY : src/ausiliarie/funzioni_ausiliarie.s
 
-# target to build an object file
-src/base.o:
-	$(MAKE) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/src/base.o
-.PHONY : src/base.o
-
-# target to preprocess a source file
-src/base.i:
-	$(MAKE) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/src/base.i
-.PHONY : src/base.i
-
 # target to generate assembly for a file
-src/base.s:
-	$(MAKE) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/src/base.s
-.PHONY : src/base.s
+src/ausiliarie/funzioni_ausiliarie.c.s:
+	$(MAKE) -f CMakeFiles/ausiliarie.dir/build.make CMakeFiles/ausiliarie.dir/src/ausiliarie/funzioni_ausiliarie.c.s
+.PHONY : src/ausiliarie/funzioni_ausiliarie.c.s
 
-# target to build an object file
-src/core/pic2netus.o:
-	$(MAKE) -f CMakeFiles/pic2netus.dir/build.make CMakeFiles/pic2netus.dir/src/core/pic2netus.o
+src/core/pic2netus.o: src/core/pic2netus.c.o
 .PHONY : src/core/pic2netus.o
 
-# target to preprocess a source file
-src/core/pic2netus.i:
-	$(MAKE) -f CMakeFiles/pic2netus.dir/build.make CMakeFiles/pic2netus.dir/src/core/pic2netus.i
+# target to build an object file
+src/core/pic2netus.c.o:
+	$(MAKE) -f CMakeFiles/pic2netus.dir/build.make CMakeFiles/pic2netus.dir/src/core/pic2netus.c.o
+.PHONY : src/core/pic2netus.c.o
+
+src/core/pic2netus.i: src/core/pic2netus.c.i
 .PHONY : src/core/pic2netus.i
 
-# target to generate assembly for a file
-src/core/pic2netus.s:
-	$(MAKE) -f CMakeFiles/pic2netus.dir/build.make CMakeFiles/pic2netus.dir/src/core/pic2netus.s
+# target to preprocess a source file
+src/core/pic2netus.c.i:
+	$(MAKE) -f CMakeFiles/pic2netus.dir/build.make CMakeFiles/pic2netus.dir/src/core/pic2netus.c.i
+.PHONY : src/core/pic2netus.c.i
+
+src/core/pic2netus.s: src/core/pic2netus.c.s
 .PHONY : src/core/pic2netus.s
 
-# target to build an object file
-src/core/robot_core.o:
-	$(MAKE) -f CMakeFiles/robotcore.dir/build.make CMakeFiles/robotcore.dir/src/core/robot_core.o
+# target to generate assembly for a file
+src/core/pic2netus.c.s:
+	$(MAKE) -f CMakeFiles/pic2netus.dir/build.make CMakeFiles/pic2netus.dir/src/core/pic2netus.c.s
+.PHONY : src/core/pic2netus.c.s
+
+src/core/robot_core.o: src/core/robot_core.c.o
 .PHONY : src/core/robot_core.o
 
-# target to preprocess a source file
-src/core/robot_core.i:
-	$(MAKE) -f CMakeFiles/robotcore.dir/build.make CMakeFiles/robotcore.dir/src/core/robot_core.i
+# target to build an object file
+src/core/robot_core.c.o:
+	$(MAKE) -f CMakeFiles/robotcore.dir/build.make CMakeFiles/robotcore.dir/src/core/robot_core.c.o
+.PHONY : src/core/robot_core.c.o
+
+src/core/robot_core.i: src/core/robot_core.c.i
 .PHONY : src/core/robot_core.i
 
-# target to generate assembly for a file
-src/core/robot_core.s:
-	$(MAKE) -f CMakeFiles/robotcore.dir/build.make CMakeFiles/robotcore.dir/src/core/robot_core.s
+# target to preprocess a source file
+src/core/robot_core.c.i:
+	$(MAKE) -f CMakeFiles/robotcore.dir/build.make CMakeFiles/robotcore.dir/src/core/robot_core.c.i
+.PHONY : src/core/robot_core.c.i
+
+src/core/robot_core.s: src/core/robot_core.c.s
 .PHONY : src/core/robot_core.s
 
+# target to generate assembly for a file
+src/core/robot_core.c.s:
+	$(MAKE) -f CMakeFiles/robotcore.dir/build.make CMakeFiles/robotcore.dir/src/core/robot_core.c.s
+.PHONY : src/core/robot_core.c.s
+
+src/mainbase.o: src/mainbase.cpp.o
+.PHONY : src/mainbase.o
+
 # target to build an object file
-src/joystick.o:
-	$(MAKE) -f CMakeFiles/joystick.dir/build.make CMakeFiles/joystick.dir/src/joystick.o
-.PHONY : src/joystick.o
+src/mainbase.cpp.o:
+	$(MAKE) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/src/mainbase.cpp.o
+.PHONY : src/mainbase.cpp.o
+
+src/mainbase.i: src/mainbase.cpp.i
+.PHONY : src/mainbase.i
 
 # target to preprocess a source file
-src/joystick.i:
-	$(MAKE) -f CMakeFiles/joystick.dir/build.make CMakeFiles/joystick.dir/src/joystick.i
-.PHONY : src/joystick.i
+src/mainbase.cpp.i:
+	$(MAKE) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/src/mainbase.cpp.i
+.PHONY : src/mainbase.cpp.i
+
+src/mainbase.s: src/mainbase.cpp.s
+.PHONY : src/mainbase.s
 
 # target to generate assembly for a file
-src/joystick.s:
-	$(MAKE) -f CMakeFiles/joystick.dir/build.make CMakeFiles/joystick.dir/src/joystick.s
-.PHONY : src/joystick.s
+src/mainbase.cpp.s:
+	$(MAKE) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/src/mainbase.cpp.s
+.PHONY : src/mainbase.cpp.s
 
-# target to build an object file
-src/netus2pic/robot_comm.o:
-	$(MAKE) -f CMakeFiles/robot_comm.dir/build.make CMakeFiles/robot_comm.dir/src/netus2pic/robot_comm.o
+src/netus2pic/robot_comm.o: src/netus2pic/robot_comm.c.o
 .PHONY : src/netus2pic/robot_comm.o
 
-# target to preprocess a source file
-src/netus2pic/robot_comm.i:
-	$(MAKE) -f CMakeFiles/robot_comm.dir/build.make CMakeFiles/robot_comm.dir/src/netus2pic/robot_comm.i
+# target to build an object file
+src/netus2pic/robot_comm.c.o:
+	$(MAKE) -f CMakeFiles/robot_comm.dir/build.make CMakeFiles/robot_comm.dir/src/netus2pic/robot_comm.c.o
+.PHONY : src/netus2pic/robot_comm.c.o
+
+src/netus2pic/robot_comm.i: src/netus2pic/robot_comm.c.i
 .PHONY : src/netus2pic/robot_comm.i
 
-# target to generate assembly for a file
-src/netus2pic/robot_comm.s:
-	$(MAKE) -f CMakeFiles/robot_comm.dir/build.make CMakeFiles/robot_comm.dir/src/netus2pic/robot_comm.s
+# target to preprocess a source file
+src/netus2pic/robot_comm.c.i:
+	$(MAKE) -f CMakeFiles/robot_comm.dir/build.make CMakeFiles/robot_comm.dir/src/netus2pic/robot_comm.c.i
+.PHONY : src/netus2pic/robot_comm.c.i
+
+src/netus2pic/robot_comm.s: src/netus2pic/robot_comm.c.s
 .PHONY : src/netus2pic/robot_comm.s
 
-# target to build an object file
-src/netus2pic/serial_comm.o:
-	$(MAKE) -f CMakeFiles/serial_comm.dir/build.make CMakeFiles/serial_comm.dir/src/netus2pic/serial_comm.o
-.PHONY : src/netus2pic/serial_comm.o
-
-# target to preprocess a source file
-src/netus2pic/serial_comm.i:
-	$(MAKE) -f CMakeFiles/serial_comm.dir/build.make CMakeFiles/serial_comm.dir/src/netus2pic/serial_comm.i
-.PHONY : src/netus2pic/serial_comm.i
-
 # target to generate assembly for a file
-src/netus2pic/serial_comm.s:
-	$(MAKE) -f CMakeFiles/serial_comm.dir/build.make CMakeFiles/serial_comm.dir/src/netus2pic/serial_comm.s
-.PHONY : src/netus2pic/serial_comm.s
+src/netus2pic/robot_comm.c.s:
+	$(MAKE) -f CMakeFiles/robot_comm.dir/build.make CMakeFiles/robot_comm.dir/src/netus2pic/robot_comm.c.s
+.PHONY : src/netus2pic/robot_comm.c.s
 
-# target to build an object file
-src/saetta_teleop.o:
-	$(MAKE) -f CMakeFiles/teleop_saetta.dir/build.make CMakeFiles/teleop_saetta.dir/src/saetta_teleop.o
-.PHONY : src/saetta_teleop.o
-
-# target to preprocess a source file
-src/saetta_teleop.i:
-	$(MAKE) -f CMakeFiles/teleop_saetta.dir/build.make CMakeFiles/teleop_saetta.dir/src/saetta_teleop.i
-.PHONY : src/saetta_teleop.i
-
-# target to generate assembly for a file
-src/saetta_teleop.s:
-	$(MAKE) -f CMakeFiles/teleop_saetta.dir/build.make CMakeFiles/teleop_saetta.dir/src/saetta_teleop.s
-.PHONY : src/saetta_teleop.s
-
-# target to build an object file
-src/sensor/robot_sensors.o:
-	$(MAKE) -f CMakeFiles/robot_sensors.dir/build.make CMakeFiles/robot_sensors.dir/src/sensor/robot_sensors.o
+src/sensor/robot_sensors.o: src/sensor/robot_sensors.c.o
 .PHONY : src/sensor/robot_sensors.o
 
-# target to preprocess a source file
-src/sensor/robot_sensors.i:
-	$(MAKE) -f CMakeFiles/robot_sensors.dir/build.make CMakeFiles/robot_sensors.dir/src/sensor/robot_sensors.i
+# target to build an object file
+src/sensor/robot_sensors.c.o:
+	$(MAKE) -f CMakeFiles/robot_sensors.dir/build.make CMakeFiles/robot_sensors.dir/src/sensor/robot_sensors.c.o
+.PHONY : src/sensor/robot_sensors.c.o
+
+src/sensor/robot_sensors.i: src/sensor/robot_sensors.c.i
 .PHONY : src/sensor/robot_sensors.i
 
-# target to generate assembly for a file
-src/sensor/robot_sensors.s:
-	$(MAKE) -f CMakeFiles/robot_sensors.dir/build.make CMakeFiles/robot_sensors.dir/src/sensor/robot_sensors.s
+# target to preprocess a source file
+src/sensor/robot_sensors.c.i:
+	$(MAKE) -f CMakeFiles/robot_sensors.dir/build.make CMakeFiles/robot_sensors.dir/src/sensor/robot_sensors.c.i
+.PHONY : src/sensor/robot_sensors.c.i
+
+src/sensor/robot_sensors.s: src/sensor/robot_sensors.c.s
 .PHONY : src/sensor/robot_sensors.s
+
+# target to generate assembly for a file
+src/sensor/robot_sensors.c.s:
+	$(MAKE) -f CMakeFiles/robot_sensors.dir/build.make CMakeFiles/robot_sensors.dir/src/sensor/robot_sensors.c.s
+.PHONY : src/sensor/robot_sensors.c.s
 
 # Help Target
 help:
@@ -580,59 +692,59 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... ROSBUILD_genmsg_cpp"
-	@echo "... ROSBUILD_genmsg_lisp"
 	@echo "... ROSBUILD_gensrv_cpp"
-	@echo "... ROSBUILD_gensrv_lisp"
+	@echo "... _catkin_empty_exported_target"
 	@echo "... ausiliarie"
 	@echo "... base"
-	@echo "... clean-test-results"
+	@echo "... clean_test_results"
 	@echo "... core"
+	@echo "... doxygen"
 	@echo "... edit_cache"
-	@echo "... joystick"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
 	@echo "... pic2netus"
 	@echo "... rebuild_cache"
 	@echo "... robot_comm"
 	@echo "... robot_sensors"
 	@echo "... robotcore"
+	@echo "... rosbuild_clean-test-results"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
 	@echo "... rospack_genmsg"
 	@echo "... rospack_genmsg_libexe"
 	@echo "... rospack_gensrv"
-	@echo "... serial_comm"
-	@echo "... teleop_saetta"
+	@echo "... rs232"
+	@echo "... run_tests"
 	@echo "... test"
 	@echo "... test-future"
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
+	@echo "... gtest"
+	@echo "... gtest_main"
+	@echo "... src/Rs232/rs232.o"
+	@echo "... src/Rs232/rs232.i"
+	@echo "... src/Rs232/rs232.s"
 	@echo "... src/Saetta_Base_core.o"
 	@echo "... src/Saetta_Base_core.i"
 	@echo "... src/Saetta_Base_core.s"
 	@echo "... src/ausiliarie/funzioni_ausiliarie.o"
 	@echo "... src/ausiliarie/funzioni_ausiliarie.i"
 	@echo "... src/ausiliarie/funzioni_ausiliarie.s"
-	@echo "... src/base.o"
-	@echo "... src/base.i"
-	@echo "... src/base.s"
 	@echo "... src/core/pic2netus.o"
 	@echo "... src/core/pic2netus.i"
 	@echo "... src/core/pic2netus.s"
 	@echo "... src/core/robot_core.o"
 	@echo "... src/core/robot_core.i"
 	@echo "... src/core/robot_core.s"
-	@echo "... src/joystick.o"
-	@echo "... src/joystick.i"
-	@echo "... src/joystick.s"
+	@echo "... src/mainbase.o"
+	@echo "... src/mainbase.i"
+	@echo "... src/mainbase.s"
 	@echo "... src/netus2pic/robot_comm.o"
 	@echo "... src/netus2pic/robot_comm.i"
 	@echo "... src/netus2pic/robot_comm.s"
-	@echo "... src/netus2pic/serial_comm.o"
-	@echo "... src/netus2pic/serial_comm.i"
-	@echo "... src/netus2pic/serial_comm.s"
-	@echo "... src/saetta_teleop.o"
-	@echo "... src/saetta_teleop.i"
-	@echo "... src/saetta_teleop.s"
 	@echo "... src/sensor/robot_sensors.o"
 	@echo "... src/sensor/robot_sensors.i"
 	@echo "... src/sensor/robot_sensors.s"

@@ -14,6 +14,4 @@
 ///\brief	threshold over which an anomaly steps occurs
 #define 	THRESHOLD_STEPS_COUNTER	200
 
-///\brief	counter for the number of 200[ms] steps 
-unsigned int 	clock_counter;
 #endif
