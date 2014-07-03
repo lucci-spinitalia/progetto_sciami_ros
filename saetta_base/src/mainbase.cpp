@@ -51,6 +51,10 @@ int main(int argc, char** argv)
   // set velocity subscriber
   ros::Subscriber sub = n.subscribe("/saetta/velocity", 10, &Saetta_Base::listenerCallback, localbase);
 
+  int period_us;
+  n.param<int>("period", period_us, "20000");
+  ROS_INFO_STREAM("ROS publish refresh: " << period_us << " us");
+
   std::string nPort; //default port name
   n.param<std::string>("port", nPort, "/dev/ttyO3");
   ROS_INFO_STREAM("ROS parameter 'port' setted as: " << nPort);
@@ -77,7 +81,7 @@ int main(int argc, char** argv)
 
   while(n.ok())
   {
-    if(robot_loop(20000))
+    if(robot_loop(period_us))
     {
       ros::spinOnce();
       set_robot_speed(&(localbase->_linear),&(localbase->_angular));
