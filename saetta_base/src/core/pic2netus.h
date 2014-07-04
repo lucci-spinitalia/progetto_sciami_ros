@@ -4,7 +4,8 @@
 extern "C" {
 #endif
 #define		PIC_LOG_TO_SCREEN	0
-#include "serial_comm.h"
+
+#include "../Rs232/rs232.h"
 #include "pic_rel.h"
 #include "robot_core.h"
 #include "sensor_struct.h"
@@ -156,8 +157,8 @@ int 	genera_pacchetto_sensore_standard(unsigned char *pacchetto, struct sensore_
 Processing di uno stream di dati in input: STA PER SOSTITUIRE processa_pacchetto();
 \brief	processing del pacchetto: IN PROCESSING
 */
-int	analizza_pacchetto_init(unsigned char* buffer);
-int analizza_pacchetto(unsigned char *pic_buffer, unsigned char *buf, int len);
+int	analizza_pacchetto_init(unsigned char* buffer, int message_size);
+int analizza_pacchetto(char *pic_buffer, char *buf, int len);
 #ifdef __cplusplus
 }
 #endif

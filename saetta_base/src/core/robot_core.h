@@ -50,11 +50,6 @@ extern "C" {
 
 //====================================
 //		Global variables declaration
-///\brief	puntatore al file per il log dei dati da sensore
-FILE* fp_log;
-///\brief	mutex del puntatore a file
-pthread_mutex_t mutex_fp;
-
 ///\brief	numero di passi fatti dai due motori
 int steps_done[2];
 ///\brief	incremento stato del robot
@@ -86,8 +81,6 @@ float last_w_ref=0.0;
 const float max_lin_acc=18;//24;
 ///\brief       Maximum amount of angular acceleration
 const float max_ang_acc=2;//1.3114;
-///\brief	mutex for locking robot state buffer
-pthread_mutex_t mutex_state;
 
 ///\brief	 variabile ausiliaria per la moltiplicazione dei byte + e - significativi
 int moltiplicatore[2] = {1, 256}; //	aux
@@ -101,6 +94,10 @@ int segno[2] = {1, -1}; //	aux
 //		Functions declaration
 ///\brief	inizializzazione del modulo robot
 int init_robot(char* portname);
+
+///\brief	loop principale del robot
+int robot_loop(int time_us);
+
 ///\brief	chiusura del modulo robot
 void close_robot();
 //					OPERAZIONI DI CONTROLLO
@@ -126,19 +123,6 @@ Dato un vettore in forma polare calcolo le velocità dei due motori
 @param[out] *M2 puntatore alla vel del motore 2: ritorna la vel in cm/s !
 */
 void 	get_vel_motori_constant_ratio(float *V_D, float *W_D, float *M1, float* M2);
-
-
-
-/**
-Calcolo del numero di passi per il compimento di un rettilineo
-\brief	generazione riferimenti per moto rettilineo
-@param[in] distanza distanza da compiere in mm
-@param[in] velocità di asservimento in cm/s
-@param[in] modalita_stepping modalita di movimentazione (deve essere in accordo con quella del PIC)
-@param[out] num_passi numero di passi da far effettuare ai motori
-@param[out] vel_pic velocità di asservimento
-*/
-void genera_rettilineo(float distanza, float vel, int modalita_stepping, unsigned int* num_passi, int *vel_pic);
 
 
 /**
