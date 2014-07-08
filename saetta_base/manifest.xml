@@ -14,6 +14,7 @@ odometry of the robot.
   <depend package="roscpp"/>
   <depend package="geometry_msgs" />
   <depend package="nav_msgs"/>
+  <depend package="sensor_msgs"/>
   <depend package="tf" />
 </package>
 
