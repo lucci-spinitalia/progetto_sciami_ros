@@ -1,30 +1,28 @@
 <!-- %Tag(FULL)%-->
 <launch>
   <machine name="pi" address="raspberrypi" user="pi" default="false" env-loader="/home/pi/catkin_ws/devel/env.sh" timeout="180" /> 
-  <!--<env name="ROS_MASTER_URI" value="http://massimo-Satellite-A100:11311" /> --><!--cambiare hostname del master e della raspberry-->
+  <env name="ROS_MASTER_URI" value="http://massimo-Satellite-A100:11311" /> <!--cambiare hostname del master e della raspberry-->
 
 <!-- base node -->
   <node pkg="saetta_base" type="base" name="SaettaBase" machine="pi">
-    <param name="port" type="string" value="/dev/ttyAMA0"/>	
+    <param name="port" type="string" value="/dev/ttyAMA0"/>
+    <param name="period" type="int" value="200000"/>	
   </node>
 
-
-
-
+<!-- teleop node -->
+  <node pkg="saetta_base" type="teleop" name="teleop" machine="pi">
+     <param name="axis_linear" value="1" type="int"/>
+     <param name="axis_angular" value="0" type="int"/>
+     <param name="scale_linear" value="0.1" type="double"/>
+     <param name="scale_angular" value="0.5" type="double"/>
+  </node>
+ 
  <!-- joy node -->
   <node respawn="true" pkg="joy"
         type="joy_node" name="joy_node" >
     <param name="dev" type="string" value="/dev/input/js0" /> <!--inserire dev del joystick-->
     <param name="deadzone" value="0.12" />
   </node>
-
-
-  <!-- Axes -->
-  <param name="axis_linear" value="1" type="int"/>
-  <param name="axis_angular" value="0" type="int"/>
-  <param name="scale_linear" value="0.1" type="double"/>
-  <param name="scale_angular" value="0.5" type="double"/>
-  <node pkg="saetta_base" type="teleop" name="teleop" machine="pi"/>
 
 </launch>
 <!-- %EndTag(FULL)%-->
