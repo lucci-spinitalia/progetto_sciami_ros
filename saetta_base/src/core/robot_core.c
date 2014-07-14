@@ -428,8 +428,6 @@ void step2vel(int step1, int step2, float *vref, float *wref)
 
 int robot_loop(int time_us)
 {
-  static unsigned char message_state = 0;
-  
   FD_ZERO(&rd);
   FD_ZERO(&wr);
   FD_ZERO(&er);
@@ -477,19 +475,7 @@ int robot_loop(int time_us)
           {
             message_buffer_rx[bytes_read] = '\0';
 
-            switch(message_state)
-            {
-              case 0:
-                if(strncmp(message_buffer_rx, "START", strlen("START")) == 0)
-                  message_state++;
-                break;
-                  
-              case 1:
-                analizza_pacchetto(message_buffer_tx, message_buffer_rx, bytes_read);
-
-                message_state = 0;
-                break;
-            }
+            analizza_pacchetto(message_buffer_tx, message_buffer_rx, bytes_read);
           }
         }
       }
